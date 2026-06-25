@@ -864,38 +864,32 @@ The author thanks the broader Internet standards community whose existing specif
 
 --- back
 
-# Appendix A. Example Agent Identifier
+# Example Agent Identifier
 
 ```text
 agent://example.com/support-agent
 ```
 
-# Appendix B. Example DNS TXT Binding
+# Example DNS TXT Binding
 
 ```text
 agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.well-known/agis/agents/support-agent.json; jkt=dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08; card_sha256=842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
 ```
 
-# Appendix C. Example Agent Card Hash
+# Example Agent Card Hash
 
 ```text
 842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
 ```
 
-# Appendix D. Example JWK Thumbprint
+# Example JWK Thumbprint
 
 ```text
 dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
 ```
 
-# Appendix E. Example Content-Digest
+# Example Content-Digest
 
 ```text
 sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:
 ```
-
-# Appendix F. Authors' Address
-
-Rizk Ayoub
-EPICORTEK Technologies Inc.
-Email: [rizk.ayoub@epicortek.com](mailto:rizk.ayoub@epicortek.com)
