@@ -1,0 +1,63 @@
+name: IETF Draft Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "docs/ietf/**"
+      - ".github/workflows/ietf-draft-build.yml"
+  push:
+    paths:
+      - "docs/ietf/**"
+      - ".github/workflows/ietf-draft-build.yml"
+
+jobs:
+  build-draft:
+    name: Build Internet-Draft
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Ruby and Python tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ruby-full build-essential zlib1g-dev python3-pip
+          gem install --user-install kramdown-rfc
+          python3 -m pip install --user --upgrade pip
+          python3 -m pip install --user xml2rfc
+          echo "$(ruby -e 'print Gem.user_dir')/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify tools
+        run: |
+          ruby --version
+          kramdown-rfc --version
+          python3 --version
+          xml2rfc --version
+
+      - name: Build RFCXML
+        run: |
+          mkdir -p docs/ietf/generated
+          kramdown-rfc docs/ietf/draft-ayoub-agis-agent-identity-system-00.md \
+            > docs/ietf/generated/draft-ayoub-agis-agent-identity-system-00.xml
+
+      - name: Build text rendering
+        run: |
+          xml2rfc --text docs/ietf/generated/draft-ayoub-agis-agent-identity-system-00.xml \
+            -o docs/ietf/generated/draft-ayoub-agis-agent-identity-system-00.txt
+
+      - name: Show generated files
+        run: |
+          find docs/ietf/generated -type f -maxdepth 1 -print
+          ls -lh docs/ietf/generated
+          head -n 40 docs/ietf/generated/draft-ayoub-agis-agent-identity-system-00.txt
+
+      - name: Upload generated draft artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: agis-internet-draft-00
+          path: |
+            docs/ietf/generated/draft-ayoub-agis-agent-identity-system-00.xml
+            docs/ietf/generated/draft-ayoub-agis-agent-identity-system-00.txt
