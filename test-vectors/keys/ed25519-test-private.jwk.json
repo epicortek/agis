@@ -1,0 +1,7 @@
+{
+  "_comment": "TEST ONLY — NOT FOR PRODUCTION USE",
+  "crv": "Ed25519",
+  "d": "v1Pj3sgR5wQcdJc5d9IUZnAGZYmS4vccRnaF1F0zHSM",
+  "x": "ARcMgvwCLxMm4lHCAF5GfiC2N6D2w4tM7Mcrv-h81pg",
+  "kty": "OKP"
+}

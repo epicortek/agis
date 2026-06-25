@@ -1,0 +1,15 @@
+{
+  "type": "agis-delegation",
+  "version": "0.2.2",
+  "issuer": "agent://example.com/support-agent",
+  "subject": "agent://example.com/invoice-worker",
+  "audience": "https://api.service.example",
+  "scope": ["resource:read", "invoice:read"],
+  "constraints": {
+    "max_requests": 10,
+    "purpose": "invoice-processing"
+  },
+  "issued_at": "2026-06-23T18:30:00Z",
+  "expires_at": "2026-06-23T18:45:00Z",
+  "jti": "delegation-2026-06-23-001"
+}

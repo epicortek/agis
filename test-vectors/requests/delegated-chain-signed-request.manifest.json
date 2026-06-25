@@ -1,0 +1,43 @@
+{
+  "agis_version": "0.2.2",
+  "name": "valid-delegation-chain-signed-request",
+  "description": "AgIS signed request using a two-token delegation chain.",
+  "input": {
+    "method": "POST",
+    "target_uri": "https://api.service.example/resources/123",
+    "body": "valid-request-body.json",
+    "agent_id": "agent://example.com/line-item-reader",
+    "delegation_chain_manifest": "../delegation/valid-delegation-chain.manifest.json",
+    "content_digest_manifest": "valid-content-digest.manifest.json",
+    "request_signer_private_jwk": "../keys/ed25519-test-private.jwk.json",
+    "request_signer_public_jwk": "../keys/ed25519-test-public.jwk.json",
+    "delegation_public_jwk": "../keys/ed25519-test-public.jwk.json"
+  },
+  "expected": {
+    "root_issuer": "agent://example.com/support-agent",
+    "final_subject": "agent://example.com/line-item-reader",
+    "audience": "https://api.service.example",
+    "required_scopes": [
+      "resource:read"
+    ],
+    "date": "Tue, 23 Jun 2026 18:40:00 GMT",
+    "content_digest": "sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:",
+    "covered_components": [
+      "agis-agent",
+      "agis-delegation-chain",
+      "@method",
+      "@target-uri",
+      "content-digest",
+      "date"
+    ],
+    "created": 1782249600,
+    "key_id": "key-2026-01",
+    "alg": "ed25519",
+    "validDelegationChain": true,
+    "validRequest": true,
+    "decision": "allow",
+    "signature_input": "agis=(\"agis-agent\" \"agis-delegation-chain\" \"@method\" \"@target-uri\" \"content-digest\" \"date\");created=1782249600;keyid=\"key-2026-01\";alg=\"ed25519\"",
+    "signature_base": "\"agis-agent\": agent://example.com/line-item-reader\n\"agis-delegation-chain\": eyJhbGciOiJFZERTQSIsImtpZCI6ImtleS0yMDI2LTAxIiwidHlwIjoiYWdpcy1kZWxlZ2F0aW9uK2p3dCJ9.eyJ0eXBlIjoiYWdpcy1kZWxlZ2F0aW9uIiwidmVyc2lvbiI6IjAuMi4yIiwiaXNzdWVyIjoiYWdlbnQ6Ly9leGFtcGxlLmNvbS9zdXBwb3J0LWFnZW50Iiwic3ViamVjdCI6ImFnZW50Oi8vZXhhbXBsZS5jb20vaW52b2ljZS13b3JrZXIiLCJhdWRpZW5jZSI6Imh0dHBzOi8vYXBpLnNlcnZpY2UuZXhhbXBsZSIsInNjb3BlIjpbInJlc291cmNlOnJlYWQiLCJpbnZvaWNlOnJlYWQiXSwiY29uc3RyYWludHMiOnsibWF4X3JlcXVlc3RzIjoxMCwicHVycG9zZSI6Imludm9pY2UtcHJvY2Vzc2luZyJ9LCJpc3N1ZWRfYXQiOiIyMDI2LTA2LTIzVDE4OjMwOjAwWiIsImV4cGlyZXNfYXQiOiIyMDI2LTA2LTIzVDE4OjQ1OjAwWiIsImp0aSI6ImRlbGVnYXRpb24tMjAyNi0wNi0yMy0wMDEifQ.jYw3y6I2clnEPgIJvIAyrJYscVKRTGVc9FH1ipuVezBCfP1AxfmS7RESpWm_vGeeIHLGfqYrn1yTZq0n--mWDw,eyJhbGciOiJFZERTQSIsImtpZCI6ImtleS0yMDI2LTAxIiwidHlwIjoiYWdpcy1kZWxlZ2F0aW9uK2p3dCJ9.eyJ0eXBlIjoiYWdpcy1kZWxlZ2F0aW9uIiwidmVyc2lvbiI6IjAuMi4yIiwiaXNzdWVyIjoiYWdlbnQ6Ly9leGFtcGxlLmNvbS9pbnZvaWNlLXdvcmtlciIsInN1YmplY3QiOiJhZ2VudDovL2V4YW1wbGUuY29tL2xpbmUtaXRlbS1yZWFkZXIiLCJhdWRpZW5jZSI6Imh0dHBzOi8vYXBpLnNlcnZpY2UuZXhhbXBsZSIsInNjb3BlIjpbInJlc291cmNlOnJlYWQiXSwiY29uc3RyYWludHMiOnsibWF4X3JlcXVlc3RzIjo1LCJwdXJwb3NlIjoibGluZS1pdGVtLXJlYWRpbmcifSwiaXNzdWVkX2F0IjoiMjAyNi0wNi0yM1QxODozNjowMFoiLCJleHBpcmVzX2F0IjoiMjAyNi0wNi0yM1QxODo0NDowMFoiLCJqdGkiOiJkZWxlZ2F0aW9uLTIwMjYtMDYtMjMtMDAyIn0.MbrHHgqOqVfsJBT-qcjD27OpANAl1uCmpCqboNwEl4O05ZyhHwA2t7nBUKB8MLnBcHKOet11H9UBCzkNry6BAg\n\"@method\": POST\n\"@target-uri\": https://api.service.example/resources/123\n\"content-digest\": sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:\n\"date\": Tue, 23 Jun 2026 18:40:00 GMT\n\"@signature-params\": (\"agis-agent\" \"agis-delegation-chain\" \"@method\" \"@target-uri\" \"content-digest\" \"date\");created=1782249600;keyid=\"key-2026-01\";alg=\"ed25519\"",
+    "signature": "agis=:QmDD3+D7aZA+EZ6aMglzZ+Rtu+0pHF02ZLZ67pg+4hllURI4OUYfKEaUZmMPLddn/nO9X1VWKyCp33+kyhe9BQ==:"
+  }
+}

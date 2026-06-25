@@ -1,0 +1,11 @@
+{
+  "agis_version": "0.2.2",
+  "name": "valid-request-content-digest",
+  "description": "HTTP request body Content-Digest test vector using SHA-256 over exact UTF-8 body bytes with LF line endings.",
+  "input": {
+    "body": "valid-request-body.json"
+  },
+  "expected": {
+    "content_digest": "sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:"
+  }
+}

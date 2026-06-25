@@ -1,0 +1,31 @@
+{
+  "agis_version": "0.2.2",
+  "name": "valid-two-token-delegation-chain",
+  "description": "Two-token AgIS delegation chain from support-agent to invoice-worker to line-item-reader.",
+  "input": {
+    "token_1_manifest": "valid-delegation-token.manifest.json",
+    "payload_2": "valid-delegation-payload-2.json",
+    "private_jwk": "../keys/ed25519-test-private.jwk.json",
+    "public_jwk": "../keys/ed25519-test-public.jwk.json"
+  },
+  "expected": {
+    "root_issuer": "agent://example.com/support-agent",
+    "intermediate": "agent://example.com/invoice-worker",
+    "final_subject": "agent://example.com/line-item-reader",
+    "audience": "https://api.service.example",
+    "required_scopes": [
+      "resource:read"
+    ],
+    "effective_scopes": [
+      "resource:read"
+    ],
+    "verifier_time": "2026-06-23T18:40:00Z",
+    "chain_length": 2,
+    "valid": true,
+    "compact_jws_2": "eyJhbGciOiJFZERTQSIsImtpZCI6ImtleS0yMDI2LTAxIiwidHlwIjoiYWdpcy1kZWxlZ2F0aW9uK2p3dCJ9.eyJ0eXBlIjoiYWdpcy1kZWxlZ2F0aW9uIiwidmVyc2lvbiI6IjAuMi4yIiwiaXNzdWVyIjoiYWdlbnQ6Ly9leGFtcGxlLmNvbS9pbnZvaWNlLXdvcmtlciIsInN1YmplY3QiOiJhZ2VudDovL2V4YW1wbGUuY29tL2xpbmUtaXRlbS1yZWFkZXIiLCJhdWRpZW5jZSI6Imh0dHBzOi8vYXBpLnNlcnZpY2UuZXhhbXBsZSIsInNjb3BlIjpbInJlc291cmNlOnJlYWQiXSwiY29uc3RyYWludHMiOnsibWF4X3JlcXVlc3RzIjo1LCJwdXJwb3NlIjoibGluZS1pdGVtLXJlYWRpbmcifSwiaXNzdWVkX2F0IjoiMjAyNi0wNi0yM1QxODozNjowMFoiLCJleHBpcmVzX2F0IjoiMjAyNi0wNi0yM1QxODo0NDowMFoiLCJqdGkiOiJkZWxlZ2F0aW9uLTIwMjYtMDYtMjMtMDAyIn0.MbrHHgqOqVfsJBT-qcjD27OpANAl1uCmpCqboNwEl4O05ZyhHwA2t7nBUKB8MLnBcHKOet11H9UBCzkNry6BAg",
+    "compact_jws_chain": [
+      "eyJhbGciOiJFZERTQSIsImtpZCI6ImtleS0yMDI2LTAxIiwidHlwIjoiYWdpcy1kZWxlZ2F0aW9uK2p3dCJ9.eyJ0eXBlIjoiYWdpcy1kZWxlZ2F0aW9uIiwidmVyc2lvbiI6IjAuMi4yIiwiaXNzdWVyIjoiYWdlbnQ6Ly9leGFtcGxlLmNvbS9zdXBwb3J0LWFnZW50Iiwic3ViamVjdCI6ImFnZW50Oi8vZXhhbXBsZS5jb20vaW52b2ljZS13b3JrZXIiLCJhdWRpZW5jZSI6Imh0dHBzOi8vYXBpLnNlcnZpY2UuZXhhbXBsZSIsInNjb3BlIjpbInJlc291cmNlOnJlYWQiLCJpbnZvaWNlOnJlYWQiXSwiY29uc3RyYWludHMiOnsibWF4X3JlcXVlc3RzIjoxMCwicHVycG9zZSI6Imludm9pY2UtcHJvY2Vzc2luZyJ9LCJpc3N1ZWRfYXQiOiIyMDI2LTA2LTIzVDE4OjMwOjAwWiIsImV4cGlyZXNfYXQiOiIyMDI2LTA2LTIzVDE4OjQ1OjAwWiIsImp0aSI6ImRlbGVnYXRpb24tMjAyNi0wNi0yMy0wMDEifQ.jYw3y6I2clnEPgIJvIAyrJYscVKRTGVc9FH1ipuVezBCfP1AxfmS7RESpWm_vGeeIHLGfqYrn1yTZq0n--mWDw",
+      "eyJhbGciOiJFZERTQSIsImtpZCI6ImtleS0yMDI2LTAxIiwidHlwIjoiYWdpcy1kZWxlZ2F0aW9uK2p3dCJ9.eyJ0eXBlIjoiYWdpcy1kZWxlZ2F0aW9uIiwidmVyc2lvbiI6IjAuMi4yIiwiaXNzdWVyIjoiYWdlbnQ6Ly9leGFtcGxlLmNvbS9pbnZvaWNlLXdvcmtlciIsInN1YmplY3QiOiJhZ2VudDovL2V4YW1wbGUuY29tL2xpbmUtaXRlbS1yZWFkZXIiLCJhdWRpZW5jZSI6Imh0dHBzOi8vYXBpLnNlcnZpY2UuZXhhbXBsZSIsInNjb3BlIjpbInJlc291cmNlOnJlYWQiXSwiY29uc3RyYWludHMiOnsibWF4X3JlcXVlc3RzIjo1LCJwdXJwb3NlIjoibGluZS1pdGVtLXJlYWRpbmcifSwiaXNzdWVkX2F0IjoiMjAyNi0wNi0yM1QxODozNjowMFoiLCJleHBpcmVzX2F0IjoiMjAyNi0wNi0yM1QxODo0NDowMFoiLCJqdGkiOiJkZWxlZ2F0aW9uLTIwMjYtMDYtMjMtMDAyIn0.MbrHHgqOqVfsJBT-qcjD27OpANAl1uCmpCqboNwEl4O05ZyhHwA2t7nBUKB8MLnBcHKOet11H9UBCzkNry6BAg"
+    ]
+  }
+}

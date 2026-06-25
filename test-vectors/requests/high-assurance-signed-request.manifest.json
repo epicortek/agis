@@ -1,0 +1,37 @@
+{
+  "agis_version": "0.2.2",
+  "name": "high-assurance-agis-http-message-signature",
+  "description": "AgIS HTTP Message Signature test vector with nonce for high-assurance replay protection, covering agis-agent, agis-nonce, @method, @target-uri, content-digest, and date.",
+  "input": {
+    "method": "POST",
+    "target_uri": "https://api.service.example/resources/123",
+    "body": "valid-request-body.json",
+    "agent_id": "agent://example.com/support-agent",
+    "nonce": "nonce-2026-06-23-001",
+    "content_digest_manifest": "valid-content-digest.manifest.json",
+    "private_jwk": "../keys/ed25519-test-private.jwk.json",
+    "public_jwk": "../keys/ed25519-test-public.jwk.json"
+  },
+  "expected": {
+    "covered_components": [
+      "agis-agent",
+      "agis-nonce",
+      "@method",
+      "@target-uri",
+      "content-digest",
+      "date"
+    ],
+    "method": "POST",
+    "target_uri": "https://api.service.example/resources/123",
+    "agent_id": "agent://example.com/support-agent",
+    "nonce": "nonce-2026-06-23-001",
+    "date": "Tue, 23 Jun 2026 18:30:00 GMT",
+    "content_digest": "sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:",
+    "alg": "ed25519",
+    "keyid": "key-2026-01",
+    "signature_valid": true,
+    "signature_input": "agis=(\"agis-agent\" \"agis-nonce\" \"@method\" \"@target-uri\" \"content-digest\" \"date\");created=1782249000;keyid=\"key-2026-01\";alg=\"ed25519\"",
+    "signature_base": "\"agis-agent\": agent://example.com/support-agent\n\"agis-nonce\": nonce-2026-06-23-001\n\"@method\": POST\n\"@target-uri\": https://api.service.example/resources/123\n\"content-digest\": sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:\n\"date\": Tue, 23 Jun 2026 18:30:00 GMT\n\"@signature-params\": (\"agis-agent\" \"agis-nonce\" \"@method\" \"@target-uri\" \"content-digest\" \"date\");created=1782249000;keyid=\"key-2026-01\";alg=\"ed25519\"",
+    "signature": "agis=:WsY2uYXdd/CJiPmFHr134s8xz6w5QLx6dasQ4elHKiMqGXQF8qHSNtWxByLDvZ4i6xakBK1RcTVHO0sHabkLDg==:"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "agis_version": "0.2.2",
+  "agent_id": "agent://example.com/support-agent",
+  "name": "support-agent",
+  "owner": {
+    "name": "Example Organization",
+    "domain": "example.com"
+  },
+  "status": "active",
+  "public_keys": [
+    {
+      "id": "key-2026-01",
+      "type": "OKP",
+      "crv": "Ed25519",
+      "use": "sig",
+      "alg": "EdDSA",
+      "jwk_thumbprint": "dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08",
+      "public_key_jwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "ARcMgvwCLxMm4lHCAF5GfiC2N6D2w4tM7Mcrv-h81pg"
+      },
+      "status": "active",
+      "created_at": "2026-06-23T00:00:00Z"
+    }
+  ],
+  "capabilities": [
+    "signed_requests",
+    "agent_identity"
+  ],
+  "endpoints": {
+    "status": "https://example.com/.well-known/agis/agents/support-agent/status.json",
+    "jwks": "https://example.com/.well-known/agis/agents/support-agent/jwks.json"
+  },
+  "cache": {
+    "agent_card_ttl_seconds": 86400,
+    "status_ttl_seconds": 60
+  },
+  "issued_at": "2026-06-23T00:00:00Z",
+  "updated_at": "2026-06-23T00:00:00Z"
+}

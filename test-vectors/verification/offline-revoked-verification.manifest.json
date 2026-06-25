@@ -1,0 +1,24 @@
+{
+  "agis_version": "0.2.2",
+  "name": "offline-revoked-agent-verification",
+  "description": "Composite offline AgIS verification for a revoked agent. The identity remains verifiable, but the decision must be deny.",
+  "input": {
+    "dns_txt": "../dns/valid-dns-binding.txt",
+    "signed_agent_card": "../agent-card/signed-agent-card.json",
+    "status": "../status/revoked-status.json"
+  },
+  "expected": {
+    "validIdentity": true,
+    "active": false,
+    "revoked": true,
+    "trustLevel": 4,
+    "decision": "deny",
+    "checks": {
+      "dnsBinding": true,
+      "agentCardHash": true,
+      "jwkThumbprint": true,
+      "agentCardSignature": true,
+      "status": true
+    }
+  }
+}

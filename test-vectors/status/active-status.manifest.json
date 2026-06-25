@@ -1,0 +1,15 @@
+{
+  "agis_version": "0.2.2",
+  "name": "active-agent-status",
+  "description": "Valid active Agent Status document for AgIS v0.2.2.",
+  "input": {
+    "status": "active-status.json"
+  },
+  "expected": {
+    "agent_id": "agent://example.com/support-agent",
+    "status": "active",
+    "valid": true,
+    "revoked": false,
+    "ttl_seconds": 60
+  }
+}

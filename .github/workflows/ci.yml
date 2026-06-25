@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install SDK dependencies
+        run: npm install
+        working-directory: packages/agis-sdk-ts
+
+      - name: Install CLI dependencies
+        run: npm install
+        working-directory: packages/agis-cli
+
+      - name: Build SDK
+        run: npm run build
+        working-directory: packages/agis-sdk-ts
+
+      - name: Build CLI
+        run: npm run build
+        working-directory: packages/agis-cli
+
+      - name: Typecheck SDK
+        run: npm run typecheck
+        working-directory: packages/agis-sdk-ts
+
+      - name: Typecheck CLI
+        run: npm run typecheck
+        working-directory: packages/agis-cli
+
+      - name: Run test vectors
+        run: npm run test:vectors
+        working-directory: packages/agis-sdk-ts
+
+      - name: CLI smoke test
+        run: |
+          node dist/index.js --version
+          node dist/index.js card hash --card ../../test-vectors/agent-card/valid-agent-card.json
+          node dist/index.js jwk thumbprint --jwk ../../test-vectors/keys/ed25519-test-public.jwk.json
+          node dist/index.js dns parse --txt ../../test-vectors/dns/valid-dns-binding.txt
+          node dist/index.js digest body --body ../../test-vectors/requests/valid-request-body.json
+        working-directory: packages/agis-cli
+
+      - name: Package smoke test
+        run: npm run smoke:pack
+
+      - name: Release audit
+        run: npm run release:audit

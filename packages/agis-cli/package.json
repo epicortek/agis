@@ -1,0 +1,41 @@
+{
+  "name": "@epicortek/agis-cli",
+  "version": "0.2.2-alpha.1",
+  "description": "Command-line tools for AgIS — Agent Identity System.",
+  "author": "EPICORTEK Technologies Inc.",
+  "contributors": [
+    "Rizk Ayoub"
+  ],
+  "type": "module",
+  "bin": {
+    "agis": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist', {recursive:true,force:true})\"",
+    "build": "npm run clean && tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": [
+    "agis",
+    "agent-identity",
+    "cli",
+    "offline-verification"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@epicortek/agis-sdk-ts": "0.2.2-alpha.1",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}

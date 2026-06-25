@@ -1,0 +1,16 @@
+{
+  "agis_version": "0.2.2",
+  "name": "revoked-agent-status",
+  "description": "Valid revoked Agent Status document. A revoked agent must still resolve but must not be treated as active.",
+  "input": {
+    "status": "revoked-status.json"
+  },
+  "expected": {
+    "agent_id": "agent://example.com/support-agent",
+    "status": "revoked",
+    "valid": true,
+    "revoked": true,
+    "ttl_seconds": 30,
+    "reason": "key_compromise"
+  }
+}

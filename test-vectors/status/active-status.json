@@ -1,0 +1,8 @@
+{
+  "agent_id": "agent://example.com/support-agent",
+  "status": "active",
+  "updated_at": "2026-06-23T00:00:00Z",
+  "cache": {
+    "ttl_seconds": 60
+  }
+}

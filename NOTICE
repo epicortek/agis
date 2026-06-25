@@ -1,0 +1,9 @@
+AgIS — Agent Identity System
+
+AgIS was created and initially architected by Rizk Ayoub.
+
+The reference implementation, SDK, CLI, and deterministic test vectors are maintained under the EPICORTEK project namespace.
+
+Project steward: EPICORTEK Technologies Inc.
+Specification editor: Rizk Ayoub
+Initial architecture: Rizk Ayoub

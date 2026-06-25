@@ -1,0 +1,19 @@
+{
+  "agis_version": "0.2.2",
+  "name": "signed-agent-card-jws",
+  "description": "Agent Card JWS signing and verification test vector using Ed25519. The signature covers the RFC 8785 canonical Agent Card payload excluding the signature field.",
+  "input": {
+    "unsigned_agent_card": "valid-agent-card.json",
+    "signed_agent_card": "signed-agent-card.json",
+    "public_jwk": "../keys/ed25519-test-public.jwk.json",
+    "private_jwk": "../keys/ed25519-test-private.jwk.json"
+  },
+  "expected": {
+    "alg": "EdDSA",
+    "key_id": "key-2026-01",
+    "typ": "agis-agent-card+jcs",
+    "agent_card_sha256_excluding_signature": "842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122",
+    "signature_valid": true,
+    "compact_jws": "eyJhbGciOiJFZERTQSIsImtpZCI6ImtleS0yMDI2LTAxIiwidHlwIjoiYWdpcy1hZ2VudC1jYXJkK2pjcyJ9.eyJhZ2VudF9pZCI6ImFnZW50Oi8vZXhhbXBsZS5jb20vc3VwcG9ydC1hZ2VudCIsImFnaXNfdmVyc2lvbiI6IjAuMi4yIiwiY2FjaGUiOnsiYWdlbnRfY2FyZF90dGxfc2Vjb25kcyI6ODY0MDAsInN0YXR1c190dGxfc2Vjb25kcyI6NjB9LCJjYXBhYmlsaXRpZXMiOlsic2lnbmVkX3JlcXVlc3RzIiwiYWdlbnRfaWRlbnRpdHkiXSwiZW5kcG9pbnRzIjp7Imp3a3MiOiJodHRwczovL2V4YW1wbGUuY29tLy53ZWxsLWtub3duL2FnaXMvYWdlbnRzL3N1cHBvcnQtYWdlbnQvandrcy5qc29uIiwic3RhdHVzIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS8ud2VsbC1rbm93bi9hZ2lzL2FnZW50cy9zdXBwb3J0LWFnZW50L3N0YXR1cy5qc29uIn0sImlzc3VlZF9hdCI6IjIwMjYtMDYtMjNUMDA6MDA6MDBaIiwibmFtZSI6InN1cHBvcnQtYWdlbnQiLCJvd25lciI6eyJkb21haW4iOiJleGFtcGxlLmNvbSIsIm5hbWUiOiJFeGFtcGxlIE9yZ2FuaXphdGlvbiJ9LCJwdWJsaWNfa2V5cyI6W3siYWxnIjoiRWREU0EiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNi0yM1QwMDowMDowMFoiLCJjcnYiOiJFZDI1NTE5IiwiaWQiOiJrZXktMjAyNi0wMSIsImp3a190aHVtYnByaW50IjoiZFhCUTRaa2dBM25UdndyRmVMQUtZb2thblZmZXRDMGZ6WFVpU0ZrWWcwOCIsInB1YmxpY19rZXlfandrIjp7ImNydiI6IkVkMjU1MTkiLCJrdHkiOiJPS1AiLCJ4IjoiQVJjTWd2d0NMeE1tNGxIQ0FGNUdmaUMyTjZEMnc0dE03TWNydi1oODFwZyJ9LCJzdGF0dXMiOiJhY3RpdmUiLCJ0eXBlIjoiT0tQIiwidXNlIjoic2lnIn1dLCJzdGF0dXMiOiJhY3RpdmUiLCJ1cGRhdGVkX2F0IjoiMjAyNi0wNi0yM1QwMDowMDowMFoifQ.pOj5ZES9HJERPFc_saFcGYHdpgCn8Qa8MfkapJGW3w4AGvVCGK4G997JTal6TfJSRiGbCqfDJ1_gV4hz7S7jBQ"
+  }
+}

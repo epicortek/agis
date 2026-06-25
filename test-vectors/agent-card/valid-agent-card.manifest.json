@@ -1,0 +1,13 @@
+{
+  "agis_version": "0.2.2",
+  "name": "valid-agent-card-hash",
+  "description": "Valid Agent Card canonicalization and SHA-256 hash test using a real Ed25519 public JWK and RFC 7638 JWK thumbprint.",
+  "input": {
+    "agent_card": "valid-agent-card.json",
+    "public_jwk": "../keys/ed25519-test-public.jwk.json"
+  },
+  "expected": {
+    "jwk_thumbprint_sha256_base64url": "dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08",
+    "canonical_sha256": "842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122"
+  }
+}

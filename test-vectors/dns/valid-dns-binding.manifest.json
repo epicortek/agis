@@ -1,0 +1,19 @@
+{
+  "agis_version": "0.2.2",
+  "name": "valid-dns-binding",
+  "description": "Offline DNS TXT binding parser and validation test for AgIS v0.2.2.",
+  "input": {
+    "dns_txt": "valid-dns-binding.txt",
+    "agent_card": "../agent-card/valid-agent-card.json",
+    "agent_card_manifest": "../agent-card/valid-agent-card.manifest.json",
+    "public_jwk_manifest": "../keys/ed25519-test-jwk-thumbprint.manifest.json"
+  },
+  "expected": {
+    "agis": "0.2.2",
+    "agent": "agent://example.com/support-agent",
+    "card": "https://example.com/.well-known/agis/agents/support-agent.json",
+    "jkt": "dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08",
+    "card_sha256": "842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122",
+    "valid": true
+  }
+}

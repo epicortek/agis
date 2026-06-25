@@ -1,0 +1,11 @@
+{
+  "agis_version": "0.2.2",
+  "name": "skeleton-agent-card-hash",
+  "description": "Skeleton Agent Card canonicalization and SHA-256 hash test using placeholder key values. This vector verifies RFC 8785/JCS canonicalization and signature-field exclusion only.",
+  "input": {
+    "agent_card": "valid-agent-card.json"
+  },
+  "expected": {
+    "sha256": "99ee2ed0f456b770c6aada7698731d3394f113d4dd7108bd5a65c2f5406883ef"
+  }
+}

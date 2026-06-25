@@ -1,0 +1,30 @@
+{
+  "agis_version": "0.2.2",
+  "name": "offline-revoked-signed-request-verification",
+  "description": "End-to-end offline AgIS signed request verification for a revoked agent. The request remains cryptographically valid, but the final decision must be deny.",
+  "input": {
+    "dns_txt": "../dns/valid-dns-binding.txt",
+    "signed_agent_card": "../agent-card/signed-agent-card.json",
+    "status": "../status/revoked-status.json",
+    "body": "../requests/valid-request-body.json",
+    "signed_request_manifest": "../requests/valid-signed-request.manifest.json"
+  },
+  "expected": {
+    "validIdentity": true,
+    "validRequest": true,
+    "active": false,
+    "revoked": true,
+    "trustLevel": 4,
+    "decision": "deny",
+    "checks": {
+      "identity": true,
+      "dnsBinding": true,
+      "agentCardHash": true,
+      "jwkThumbprint": true,
+      "agentCardSignature": true,
+      "status": true,
+      "contentDigest": true,
+      "httpSignature": true
+    }
+  }
+}

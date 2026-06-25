@@ -1,0 +1,11 @@
+{
+  "agis_version": "0.2.2",
+  "name": "ed25519-public-jwk-thumbprint",
+  "description": "RFC 7638 JWK Thumbprint test vector for an Ed25519 public JWK.",
+  "input": {
+    "public_jwk": "ed25519-test-public.jwk.json"
+  },
+  "expected": {
+    "jwk_thumbprint_sha256_base64url": "dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08"
+  }
+}

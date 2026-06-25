@@ -1,0 +1,30 @@
+{
+  "agis_version": "0.2.2",
+  "name": "offline-active-signed-request-verification",
+  "description": "End-to-end offline AgIS signed request verification using DNS binding, signed Agent Card, active status, Content-Digest, and HTTP Message Signature.",
+  "input": {
+    "dns_txt": "../dns/valid-dns-binding.txt",
+    "signed_agent_card": "../agent-card/signed-agent-card.json",
+    "status": "../status/active-status.json",
+    "body": "../requests/valid-request-body.json",
+    "signed_request_manifest": "../requests/valid-signed-request.manifest.json"
+  },
+  "expected": {
+    "validIdentity": true,
+    "validRequest": true,
+    "active": true,
+    "revoked": false,
+    "trustLevel": 4,
+    "decision": "allow",
+    "checks": {
+      "identity": true,
+      "dnsBinding": true,
+      "agentCardHash": true,
+      "jwkThumbprint": true,
+      "agentCardSignature": true,
+      "status": true,
+      "contentDigest": true,
+      "httpSignature": true
+    }
+  }
+}

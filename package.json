@@ -1,0 +1,28 @@
+{
+  "name": "agis",
+  "version": "0.2.2-alpha.1",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/agis-sdk-ts",
+    "packages/agis-cli"
+  ],
+  "scripts": {
+    "build:sdk": "npm --prefix packages/agis-sdk-ts run build",
+    "build:cli": "npm --prefix packages/agis-cli run build",
+    "build": "npm run build:sdk && npm run build:cli",
+    "typecheck:sdk": "npm --prefix packages/agis-sdk-ts run typecheck",
+    "typecheck:cli": "npm --prefix packages/agis-cli run typecheck",
+    "typecheck": "npm run typecheck:sdk && npm run typecheck:cli",
+    "test:vectors": "npm --prefix packages/agis-sdk-ts run test:vectors",
+    "verify": "npm run build && npm run typecheck && npm run test:vectors",
+    "smoke:pack": "node scripts/package-smoke-test.mjs",
+    "verify:release": "npm run verify && npm run smoke:pack",
+    "publish:dry-run:sdk": "npm publish --dry-run --tag alpha --workspace @epicortek/agis-sdk-ts",
+    "publish:dry-run:cli": "npm publish --dry-run --tag alpha --workspace @epicortek/agis-cli",
+    "publish:dry-run": "npm run publish:dry-run:sdk && npm run publish:dry-run:cli",
+    "release:audit": "node scripts/release-audit.mjs",
+    "release:check": "npm run verify:release && npm run publish:dry-run && npm run release:audit"
+  },
+  "license": "Apache-2.0"
+}
