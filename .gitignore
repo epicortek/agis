@@ -4,3 +4,10 @@ dist
 .DS_Store
 *.log
 coverage
+.tmp/
+*.tgz
+agis@*
+node
+npm
+tsc
+tsx
