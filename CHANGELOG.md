@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.0-alpha.2] - 2026-06-26
+
+### Security
+
+- `allow` in `verifyDelegatedRequestOffline` now requires `checks.signatureKeyBound === true` by default (closes GitHub issue #1).
+- `allow` in `verifyDelegationChainRequestOffline` now requires `checks.signatureKeyBound === true` by default.
+- Using the deprecated `requestSignerPublicJwk` path without `allowUnboundDeprecatedSignerKey: true` forces `decision=deny` with error `DELEGATED_REQUEST_SIGNER_KEY_UNBOUND_DEPRECATED_PATH` or `DELEGATION_CHAIN_REQUEST_SIGNER_KEY_UNBOUND_DEPRECATED_PATH`.
+
+### Added
+
+- `allowUnboundDeprecatedSignerKey?: boolean` option on `verifyDelegatedRequestOffline` and `verifyDelegationChainRequestOffline`. Default: `false`. Set `true` to opt into legacy behavior with a warning.
+- Test Vector 018-negative: deprecated unbound signer key → deny by default.
+- Test Vector 019: deprecated unbound signer key + `allowUnboundDeprecatedSignerKey: true` → allow with warning.
+
 ## [0.3.0-alpha.1] - 2026-06-26
 
 ### Security

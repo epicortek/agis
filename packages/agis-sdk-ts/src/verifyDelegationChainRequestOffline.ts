@@ -44,10 +44,17 @@ export async function verifyDelegationChainRequestOffline(input: {
   /**
    * @deprecated Low-level primitive. Supply finalSubjectPublicKeys instead.
    * When used without finalSubjectPublicKeys, no key binding against the final subject is
-   * performed. A warning is added to the result. Must not be used in production without prior
-   * identity binding.
+   * performed. By default, using this path forces decision=deny and adds an error.
+   * Set allowUnboundDeprecatedSignerKey=true to opt into the legacy behavior (adds a warning,
+   * signatureKeyBound remains false).
    */
   requestSignerPublicJwk?: Record<string, unknown>;
+  /**
+   * When true, allows the deprecated requestSignerPublicJwk path to produce allow.
+   * When false (default), using requestSignerPublicJwk without finalSubjectPublicKeys
+   * forces decision=deny with error DELEGATION_CHAIN_REQUEST_SIGNER_KEY_UNBOUND_DEPRECATED_PATH.
+   */
+  allowUnboundDeprecatedSignerKey?: boolean;
   expectedRootIssuer: string;
   expectedAudience: string;
   requiredScopes: string[];
@@ -60,6 +67,7 @@ export async function verifyDelegationChainRequestOffline(input: {
     publicJwkByAgentId,
     finalSubjectPublicKeys,
     requestSignerPublicJwk,
+    allowUnboundDeprecatedSignerKey = false,
     expectedRootIssuer,
     expectedAudience,
     requiredScopes,
@@ -191,14 +199,23 @@ export async function verifyDelegationChainRequestOffline(input: {
       checks.signatureKeyBound = true;
     }
   } else if (requestSignerPublicJwk) {
-    // Deprecated low-level path: caller provides the key directly — no binding check
-    warnings.push(
-      "WARN_SIGNER_KEY_NOT_BOUND: requestSignerPublicJwk was used without finalSubjectPublicKeys. " +
-      "No key binding against the delegation chain final subject was performed. " +
-      "This is a low-level primitive and must not be used without prior identity binding."
-    );
-    resolvedPublicKeyJwk = requestSignerPublicJwk;
-    // signatureKeyBound remains false
+    if (allowUnboundDeprecatedSignerKey) {
+      // Explicit opt-in to deprecated path: emit warning and proceed, but signatureKeyBound stays false
+      warnings.push(
+        "WARN_SIGNER_KEY_NOT_BOUND: requestSignerPublicJwk was used with allowUnboundDeprecatedSignerKey=true. " +
+        "No key binding against the delegation chain final subject was performed. " +
+        "This is a low-level primitive and must not be used without prior identity binding."
+      );
+      resolvedPublicKeyJwk = requestSignerPublicJwk;
+    } else {
+      // Default: deny — unbound deprecated path is not allowed without explicit opt-in
+      errors.push(
+        "DELEGATION_CHAIN_REQUEST_SIGNER_KEY_UNBOUND_DEPRECATED_PATH: requestSignerPublicJwk was used without " +
+        "finalSubjectPublicKeys. Set allowUnboundDeprecatedSignerKey=true to opt into legacy behavior, " +
+        "or provide finalSubjectPublicKeys for safe key binding."
+      );
+      // No key to verify with — leave resolvedPublicKeyJwk undefined
+    }
   } else {
     errors.push("DELEGATION_CHAIN_REQUEST_SIGNATURE_KEY_NOT_FOUND: no public key provided for HTTP signature verification");
   }
@@ -226,7 +243,10 @@ export async function verifyDelegationChainRequestOffline(input: {
   // ── Final result ──────────────────────────────────────────────────────────
   const validDelegationChain = checks.delegationChain;
   const validRequest = checks.contentDigest && checks.httpSignature;
-  const decision: "allow" | "deny" = validDelegationChain && validRequest ? "allow" : "deny";
+  // allow requires signatureKeyBound=true unless the caller has explicitly opted into
+  // the deprecated unbound path via allowUnboundDeprecatedSignerKey=true
+  const keyBindingOk = checks.signatureKeyBound || allowUnboundDeprecatedSignerKey;
+  const decision: "allow" | "deny" = validDelegationChain && validRequest && keyBindingOk ? "allow" : "deny";
 
   return {
     validDelegationChain,

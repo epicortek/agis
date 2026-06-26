@@ -1,6 +1,6 @@
 {
   "name": "@epicortek/agis-cli",
-  "version": "0.3.0-alpha.1",
+  "version": "0.3.0-alpha.2",
   "description": "Command-line tools for AgIS — Agent Identity System.",
   "author": "EPICORTEK Technologies Inc.",
   "contributors": [
@@ -30,7 +30,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@epicortek/agis-sdk-ts": "0.3.0-alpha.1",
+    "@epicortek/agis-sdk-ts": "0.3.0-alpha.2",
     "commander": "^13.1.0"
   },
   "devDependencies": {
