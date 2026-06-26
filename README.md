@@ -113,7 +113,7 @@ See [`docs/ANS_COMPATIBILITY.md`](docs/ANS_COMPATIBILITY.md) for a detailed mapp
 
 ## Current implementation status
 
-AgIS v0.3.0-alpha.2 is implemented as an offline TypeScript reference SDK with deterministic test vectors.
+AgIS v0.3.0-alpha.3 is implemented as an offline TypeScript reference SDK with deterministic test vectors.
 
 | Component | Status |
 |---|---|
@@ -122,6 +122,7 @@ AgIS v0.3.0-alpha.2 is implemented as an offline TypeScript reference SDK with d
 | DNS TXT binding | Implemented |
 | Agent Card JWS signing + verification | Implemented |
 | Agent Status + status decision policy | Implemented |
+| Signed status document (EdDSA/JWS) | Implemented (alpha) |
 | Offline composite identity verification | Implemented |
 | Content-Digest (RFC 9530) | Implemented |
 | HTTP Message Signature profile (RFC 9421 subset) | Implemented |
@@ -130,6 +131,7 @@ AgIS v0.3.0-alpha.2 is implemented as an offline TypeScript reference SDK with d
 | Delegated signed request verification | Implemented |
 | Two-token delegation chain | Implemented |
 | Experimental JSON Schemas | Implemented |
+| Signed status document for live fetching | Designed; live fetching not yet implemented |
 | Live DNS lookup | Not yet |
 | Live HTTP fetching | Not yet |
 | DNSSEC validation | Not yet |

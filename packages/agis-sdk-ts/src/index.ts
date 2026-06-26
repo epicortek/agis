@@ -3,6 +3,8 @@ export * from "./jwkThumbprint.js";
 export * from "./dnsBinding.js";
 export * from "./agentCardSignature.js";
 export * from "./agentStatus.js";
+export * from "./agentStatusSignature.js";
+export * from "./verifyAgentStatusOffline.js";
 export * from "./verifyAgentOffline.js";
 export * from "./contentDigest.js";
 export * from "./httpMessageSignature.js";

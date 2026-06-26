@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.0-alpha.3] - 2026-06-26
+
+### Added
+
+- Signed agent status document support (closes GitHub issue #5).
+- `agentStatusSignature.ts`: `canonicalizeAgentStatusForSigning`, `signAgentStatus`, `verifyAgentStatusSignature` using EdDSA / Ed25519.
+- `verifyAgentStatusOffline.ts`: `verifyAgentStatusDocument` — combines structural validation, optional/required EdDSA signature verification, and status decision mapping.
+- `AgisStatusSignature` type exported from the SDK.
+- `AgisStatusSignatureVerificationResult` type exported from the SDK.
+- `AgisStatusVerificationResult` type exported from the SDK.
+- Error codes: `STATUS_SIGNATURE_MISSING`, `STATUS_SIGNATURE_TYPE_INVALID`, `STATUS_SIGNATURE_ALG_INVALID`, `STATUS_SIGNATURE_PROTECTED_ALG_INVALID`, `STATUS_SIGNATURE_KID_MISMATCH`, `STATUS_SIGNATURE_PAYLOAD_MISMATCH`, `STATUS_SIGNATURE_VERIFICATION_FAILED`.
+- `requireSignature` option on `verifyAgentStatusDocument`: when `true`, an unsigned or tampered document forces `decision=deny`.
+- Test Vector 020: valid signed active status — signature valid, decision=allow.
+- Test Vector 021-negative: tampered signed status — signature verification fails, decision=deny.
+- Test Vector 022-negative: signed revoked status — signature valid, decision=deny (status policy).
+- Test Vector 023-negative: unsigned status with `requireSignature=true` — decision=deny.
+- `schemas/status.schema.json` updated to include optional `signature` object field with EdDSA/JWS structure.
+- Updated README, SECURITY.md, and Internet-Draft Security Considerations with signed status notes.
+
 ## [0.3.0-alpha.2] - 2026-06-26
 
 ### Security
