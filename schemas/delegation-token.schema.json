@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agis.epicortek.com/schemas/delegation-token.schema.json",
+  "title": "AgIS Delegation Token",
+  "description": "EXPERIMENTAL. Defines the structure of an AgIS Delegation Token — a signed assertion that grants a delegate agent permission to act on behalf of a principal agent for a bounded scope and duration. Schema is aligned with AgIS SDK v0.3.0-alpha.0.",
+  "x-experimental": true,
+  "type": "object",
+  "required": ["principal_agent_id", "delegate_agent_id", "scope", "issued_at", "expires_at", "signature"],
+  "additionalProperties": true,
+  "properties": {
+    "principal_agent_id": {
+      "type": "string",
+      "description": "Agent identifier of the principal (the agent granting delegation)."
+    },
+    "delegate_agent_id": {
+      "type": "string",
+      "description": "Agent identifier of the delegate (the agent receiving delegation authority)."
+    },
+    "scope": {
+      "type": "array",
+      "description": "Set of permission identifiers or action scopes that this delegation covers.",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when this delegation token was issued."
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when this delegation token expires. Must be after issued_at."
+    },
+    "nonce": {
+      "type": "string",
+      "description": "Optional random nonce for replay protection."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Optional constraints limiting how and where this delegation may be exercised.",
+      "additionalProperties": true,
+      "properties": {
+        "max_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum chain depth allowed for re-delegation. 1 means no re-delegation permitted."
+        },
+        "allowed_targets": {
+          "type": "array",
+          "description": "Optional list of target service URIs or identifiers where the delegation is valid.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "description": "JWS-style signature over the canonical form of this delegation token, signed by the principal.",
+      "required": ["type", "alg", "key_id", "value"],
+      "properties": {
+        "type": { "type": "string", "enum": ["JWS"] },
+        "alg": { "type": "string" },
+        "key_id": { "type": "string", "description": "Key ID of the principal's signing key." },
+        "value": { "type": "string", "description": "Base64url-encoded JWS compact or detached signature." }
+      }
+    }
+  }
+}

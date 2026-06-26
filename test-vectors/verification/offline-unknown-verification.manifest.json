@@ -1,0 +1,25 @@
+{
+  "agis_version": "0.3.0",
+  "name": "offline-unknown-agent-verification",
+  "description": "Composite offline AgIS verification with unknown agent status — must produce decision=review and reasonCode=AGENT_STATUS_UNKNOWN. Must never produce allow.",
+  "input": {
+    "dns_txt": "../dns/valid-dns-binding.txt",
+    "signed_agent_card": "../agent-card/signed-agent-card.json",
+    "status": "../status/unknown-status.json"
+  },
+  "expected": {
+    "validIdentity": true,
+    "active": false,
+    "revoked": false,
+    "trustLevel": 4,
+    "decision": "review",
+    "reasonCode": "AGENT_STATUS_UNKNOWN",
+    "checks": {
+      "dnsBinding": true,
+      "agentCardHash": true,
+      "jwkThumbprint": true,
+      "agentCardSignature": true,
+      "status": true
+    }
+  }
+}

@@ -1,19 +1,19 @@
 {
-  "agis_version": "0.2.2",
-  "name": "offline-active-agent-verification",
-  "description": "Composite offline AgIS verification using DNS binding, signed Agent Card, JWK thumbprint, Agent Card hash, and active status.",
+  "agis_version": "0.3.0",
+  "name": "offline-compromised-agent-verification",
+  "description": "Composite offline AgIS verification with a compromised agent — must produce decision=deny and reasonCode=AGENT_COMPROMISED.",
   "input": {
     "dns_txt": "../dns/valid-dns-binding.txt",
     "signed_agent_card": "../agent-card/signed-agent-card.json",
-    "status": "../status/active-status.json"
+    "status": "../status/compromised-status.json"
   },
   "expected": {
     "validIdentity": true,
-    "active": true,
+    "active": false,
     "revoked": false,
     "trustLevel": 4,
-    "decision": "allow",
-    "reasonCode": "AGENT_ACTIVE",
+    "decision": "deny",
+    "reasonCode": "AGENT_COMPROMISED",
     "checks": {
       "dnsBinding": true,
       "agentCardHash": true,

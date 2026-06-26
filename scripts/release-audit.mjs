@@ -94,7 +94,7 @@ if (cliPkg.name === "@epicortek/agis-cli") {
 
 // ── Check 2: Package versions ─────────────────────────────────────────────────
 console.log("\n[2] Package versions");
-const expectedVersion = "0.2.2-alpha.1";
+const expectedVersion = "0.3.0-alpha.0";
 const rootPkg = readJson("package.json");
 
 [
@@ -243,8 +243,8 @@ if (
 // ── Check 10: Tarball presence (informational only) ───────────────────────────
 console.log("\n[10] Expected tarballs");
 const EXPECTED_TARBALLS = [
-  "packages/agis-sdk-ts/epicortek-agis-sdk-ts-0.2.2-alpha.1.tgz",
-  "packages/agis-cli/epicortek-agis-cli-0.2.2-alpha.1.tgz",
+  "packages/agis-sdk-ts/epicortek-agis-sdk-ts-0.3.0-alpha.0.tgz",
+  "packages/agis-cli/epicortek-agis-cli-0.3.0-alpha.0.tgz",
 ];
 const missingTarballs = EXPECTED_TARBALLS.filter((t) => !fileExists(t));
 if (missingTarballs.length === 0) {

@@ -6,6 +6,16 @@ export type AgisAgentStatusValue =
   | "compromised"
   | "unknown";
 
+export type AgisAgentStatusDecision = "allow" | "deny" | "review";
+
+export type AgisAgentStatusReasonCode =
+  | "AGENT_ACTIVE"
+  | "AGENT_REVOKED"
+  | "AGENT_SUSPENDED"
+  | "AGENT_COMPROMISED"
+  | "AGENT_STATUS_UNKNOWN"
+  | "AGENT_DEPRECATED";
+
 export type AgisAgentStatusDocument = {
   agent_id: string;
   status: AgisAgentStatusValue;
@@ -22,7 +32,14 @@ export type AgisAgentStatusValidationResult =
       valid: true;
       agentId: string;
       status: AgisAgentStatusValue;
+      /** Whether the agent is actively usable (status === "active"). */
+      active: boolean;
+      /** Backward-compatible: true only when status === "revoked". */
       revoked: boolean;
+      /** Policy decision derived from status value. */
+      statusDecision: AgisAgentStatusDecision;
+      /** Reason code for the policy decision. */
+      reasonCode: AgisAgentStatusReasonCode;
       ttlSeconds?: number;
       reason?: string;
     }
@@ -39,6 +56,29 @@ const ALLOWED_STATUSES: AgisAgentStatusValue[] = [
   "compromised",
   "unknown",
 ];
+
+/**
+ * Maps each status value to its policy decision and reason code.
+ *
+ * Policy:
+ *   active      → allow  (AGENT_ACTIVE)
+ *   revoked     → deny   (AGENT_REVOKED)
+ *   suspended   → deny   (AGENT_SUSPENDED)
+ *   compromised → deny   (AGENT_COMPROMISED)
+ *   unknown     → review (AGENT_STATUS_UNKNOWN)
+ *   deprecated  → review (AGENT_DEPRECATED)
+ */
+const STATUS_POLICY: Record<
+  AgisAgentStatusValue,
+  { decision: AgisAgentStatusDecision; reasonCode: AgisAgentStatusReasonCode }
+> = {
+  active:     { decision: "allow",  reasonCode: "AGENT_ACTIVE" },
+  revoked:    { decision: "deny",   reasonCode: "AGENT_REVOKED" },
+  suspended:  { decision: "deny",   reasonCode: "AGENT_SUSPENDED" },
+  compromised:{ decision: "deny",   reasonCode: "AGENT_COMPROMISED" },
+  unknown:    { decision: "review", reasonCode: "AGENT_STATUS_UNKNOWN" },
+  deprecated: { decision: "review", reasonCode: "AGENT_DEPRECATED" },
+};
 
 function isValidDateString(value: unknown): boolean {
   if (typeof value !== "string" || value.trim() === "") return false;
@@ -107,12 +147,16 @@ export function validateAgentStatus(input: {
 
   const status = doc.status as AgisAgentStatusValue;
   const cache = doc.cache as { ttl_seconds?: number } | undefined;
+  const { decision: statusDecision, reasonCode } = STATUS_POLICY[status];
 
   return {
     valid: true,
     agentId: doc.agent_id as string,
     status,
+    active: status === "active",
     revoked: status === "revoked",
+    statusDecision,
+    reasonCode,
     ttlSeconds: cache?.ttl_seconds,
     reason: doc.reason as string | undefined,
   };

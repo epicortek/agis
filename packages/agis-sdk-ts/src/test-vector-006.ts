@@ -44,6 +44,9 @@ function checkResult(
   assertField(label, "revoked", result.revoked, expected.revoked);
   assertField(label, "trustLevel", result.trustLevel, expected.trustLevel);
   assertField(label, "decision", result.decision, expected.decision);
+  if (expected.reasonCode !== undefined) {
+    assertField(label, "reasonCode", result.reasonCode, expected.reasonCode);
+  }
 
   const expectedChecks = expected.checks as Record<string, boolean>;
   for (const [k, v] of Object.entries(expectedChecks)) {

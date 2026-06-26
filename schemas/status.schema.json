@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agis.epicortek.com/schemas/status.schema.json",
+  "title": "AgIS Agent Status Document",
+  "description": "EXPERIMENTAL. Defines the structure of an AgIS Agent Status Document. The status value drives the policy decision: active=allow, revoked/suspended/compromised=deny, unknown/deprecated=review. Schema is aligned with AgIS SDK v0.3.0-alpha.0.",
+  "x-experimental": true,
+  "type": "object",
+  "required": ["agent_id", "status", "updated_at"],
+  "additionalProperties": true,
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Agent identifier that this status document applies to. Must match the agent_id in the corresponding Agent Card."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "revoked", "suspended", "deprecated", "compromised", "unknown"],
+      "description": "Current lifecycle status of the agent. Policy decisions: active→allow, revoked/suspended/compromised→deny, unknown/deprecated→review."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Optional human-readable reason or machine-readable code explaining the status."
+    },
+    "revoked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Required when status=revoked. ISO 8601 UTC timestamp when the agent was revoked."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when this status document was last updated."
+    },
+    "cache": {
+      "type": "object",
+      "description": "Optional cache control hints for consumers of this status document.",
+      "properties": {
+        "ttl_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Suggested TTL in seconds for caching this status document."
+        }
+      }
+    }
+  },
+  "if": {
+    "properties": { "status": { "const": "revoked" } },
+    "required": ["status"]
+  },
+  "then": {
+    "required": ["revoked_at"]
+  }
+}

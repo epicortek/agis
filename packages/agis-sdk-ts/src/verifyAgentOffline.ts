@@ -2,7 +2,7 @@ import { parseAgisDnsTxt } from "./dnsBinding.js";
 import { canonicalizeAgentCard, sha256Hex } from "./canonicalizeAgentCard.js";
 import { jwkThumbprintSha256Base64Url } from "./jwkThumbprint.js";
 import { verifyAgentCardSignature } from "./agentCardSignature.js";
-import { validateAgentStatus } from "./agentStatus.js";
+import { validateAgentStatus, AgisAgentStatusReasonCode } from "./agentStatus.js";
 
 export type AgisOfflineVerificationMode =
   | "advisory"
@@ -13,9 +13,12 @@ export type AgisOfflineVerificationMode =
 export type AgisOfflineVerificationResult = {
   validIdentity: boolean;
   active: boolean;
+  /** Backward-compatible: true only when status === "revoked". */
   revoked: boolean;
   trustLevel: 0 | 1 | 2 | 3 | 4;
   decision: "allow" | "deny" | "review";
+  /** Reason code derived from the status document policy. */
+  reasonCode?: AgisAgentStatusReasonCode;
   agentId?: string;
   cardUrl?: string;
   checks: {
@@ -149,13 +152,23 @@ export async function verifyAgentOffline(input: {
   });
 
   let revoked = false;
+  let active = false;
+  let reasonCode: AgisAgentStatusReasonCode | undefined;
+  let statusDecision: "allow" | "deny" | "review" = "review";
+
   if (statusResult.valid) {
     checks.status = true;
     revoked = statusResult.revoked;
-    if (revoked) {
+    active = statusResult.active;
+    statusDecision = statusResult.statusDecision;
+    reasonCode = statusResult.reasonCode;
+
+    if (statusDecision === "deny") {
       errors.push(
-        `VERIFY_AGENT_REVOKED: agent is revoked (reason: ${statusResult.reason ?? "unspecified"})`
+        `VERIFY_AGENT_DENIED: ${reasonCode} (reason: ${statusResult.reason ?? "unspecified"})`
       );
+    } else if (statusDecision === "review") {
+      warnings.push(`VERIFY_AGENT_REVIEW: ${reasonCode}`);
     }
     // Trust Level 4 ✓
   } else {
@@ -169,19 +182,29 @@ export async function verifyAgentOffline(input: {
   if (trustLevel >= 2 && checks.agentCardSignature) trustLevel = 3;
   if (trustLevel >= 3 && checks.status) trustLevel = 4;
 
-  // ── Derive result flags ───────────────────────────────────────────────────
   // validIdentity = cryptographic identity was confirmed (signature valid, hashes match)
   const validIdentity = checks.agentCardSignature && checks.agentCardHash && checks.jwkThumbprint;
-  const active = checks.status && statusResult.valid && !revoked;
 
   // ── Decision ──────────────────────────────────────────────────────────────
+  // Status policy takes priority over mode when trust level is 4 and status is validated.
   let decision: "allow" | "deny" | "review";
 
-  if (revoked) {
-    decision = "deny";
-  } else if (trustLevel === 4 && active) {
-    decision = "allow";
+  if (statusResult.valid && checks.status) {
+    // Status was validated — apply the policy decision directly.
+    if (statusDecision === "deny") {
+      decision = "deny";
+    } else if (trustLevel === 4 && statusDecision === "allow") {
+      decision = "allow";
+    } else if (trustLevel === 4 && statusDecision === "review") {
+      // review is never promoted to allow, regardless of mode
+      decision = "review";
+    } else {
+      // Trust level < 4 despite valid status — crypto checks failed
+      const hasCriticalError = errors.some((e) => e.startsWith("VERIFY_"));
+      decision = hasCriticalError ? "deny" : "review";
+    }
   } else {
+    // Status was not validated (invalid document or status check failed)
     const hasCriticalError = errors.some((e) => e.startsWith("VERIFY_"));
     if (mode === "advisory") {
       decision = hasCriticalError ? "review" : "allow";
@@ -196,6 +219,7 @@ export async function verifyAgentOffline(input: {
     revoked,
     trustLevel,
     decision,
+    reasonCode,
     agentId,
     cardUrl,
     checks,

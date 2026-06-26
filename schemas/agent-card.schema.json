@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agis.epicortek.com/schemas/agent-card.schema.json",
+  "title": "AgIS Agent Card",
+  "description": "EXPERIMENTAL. Defines the structure of an AgIS Agent Card — the self-describing identity document for an AI agent. Schema is aligned with AgIS SDK v0.3.0-alpha.0 test vectors.",
+  "x-experimental": true,
+  "type": "object",
+  "required": ["agent_id", "issuer", "issued_at", "public_keys"],
+  "additionalProperties": true,
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Globally unique agent identifier, typically in agent://domain/path format.",
+      "examples": ["agent://example.com/support-agent"]
+    },
+    "issuer": {
+      "type": "string",
+      "description": "Entity that issued this agent card."
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when this agent card was issued."
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional ISO 8601 UTC timestamp when this agent card expires."
+    },
+    "public_keys": {
+      "type": "array",
+      "description": "One or more public keys associated with this agent.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "public_key_jwk"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Key identifier, typically a JWK thumbprint."
+          },
+          "usage": {
+            "type": "string",
+            "enum": ["sign", "verify", "encrypt", "general"],
+            "description": "Intended key usage."
+          },
+          "public_key_jwk": {
+            "type": "object",
+            "description": "Public key in JWK format (RFC 7517).",
+            "required": ["kty"],
+            "properties": {
+              "kty": { "type": "string" },
+              "crv": { "type": "string" },
+              "x": { "type": "string" },
+              "alg": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "Optional list of declared agent capabilities.",
+      "items": { "type": "string" }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional free-form metadata about the agent.",
+      "additionalProperties": true
+    },
+    "signature": {
+      "type": "object",
+      "description": "JWS-style signature over the canonical form of this agent card.",
+      "required": ["type", "alg", "key_id", "value"],
+      "properties": {
+        "type": { "type": "string", "enum": ["JWS"] },
+        "alg": { "type": "string" },
+        "key_id": { "type": "string" },
+        "value": { "type": "string", "description": "Base64url-encoded JWS compact or detached signature." }
+      }
+    }
+  }
+}
