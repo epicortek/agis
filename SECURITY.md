@@ -7,6 +7,17 @@
 | `0.3.0-alpha.x` | Experimental / pre-release. Active development. Not recommended for production use. |
 | `0.2.2-alpha.x` | Previous experimental. No further security patches planned. |
 
+## Signed status documents (alpha)
+
+`0.3.0-alpha.3` introduces signed agent status document support. Status documents can be signed with EdDSA (Ed25519) using the same key material as Agent Cards. Verifiers can require a valid signature before accepting a status decision using the `requireSignature` option on `verifyAgentStatusDocument`.
+
+**Important limitations:**
+
+- Signed status is supported in offline deterministic mode only. Live status fetching is not yet implemented.
+- Test keys in `test-vectors/keys/` must never be used in production. They offer no security.
+- Live status fetching, when eventually implemented, will require HTTPS transport, certificate validation, and SHOULD use signed status documents before trusting a deny/allow/review decision.
+- The status schema (`schemas/status.schema.json`) remains `x-experimental: true`.
+
 No production-stable release has been made yet. Breaking changes may occur in any pre-release version.
 
 ## Reporting a vulnerability

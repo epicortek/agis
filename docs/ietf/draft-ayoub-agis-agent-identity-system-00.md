@@ -744,7 +744,7 @@ Error messages SHOULD be safe to log.  Error messages MUST NOT include private k
 
 # Deterministic Test Vectors
 
-The v0.3.0-alpha.2 reference implementation includes 19 deterministic test vectors for:
+The v0.3.0-alpha.3 reference implementation includes 23 deterministic test vectors for:
 
 * Agent Card canonical hash (TV001);
 * JWK thumbprint (TV002);
@@ -774,7 +774,11 @@ The v0.3.0-alpha.2 reference implementation includes 19 deterministic test vecto
 * chain delegated request with attacker key — negative (TV016-negative);
 * replay nonce not committed on invalid signature — negative (TV017-negative);
 * deprecated unbound signer key, deny by default — negative (TV018-negative);
-* deprecated unbound signer key, explicit opt-in allows with warning (TV019).
+* deprecated unbound signer key, explicit opt-in allows with warning (TV019);
+* signed active status document: valid signature, decision allow (TV020);
+* tampered signed status document: signature fails, decision deny (TV021-negative);
+* signed revoked status document: valid signature, decision deny — status policy (TV022-negative);
+* unsigned status document with required signature: decision deny (TV023-negative).
 
 Independent implementations SHOULD validate against the deterministic test vectors before claiming compatibility with this profile.
 
@@ -841,11 +845,15 @@ Failure to enforce this binding allows confused-deputy behavior, where the deleg
 
 ## Status Document Integrity
 
-The current alpha implementation validates status document structure and evaluates status decisions based on the declared status value.  The current AgIS profile does not yet define a signed status document format for production use.
+Status document values directly control the trust decision for an agent: `active` produces allow; `revoked`, `suspended`, and `compromised` produce deny; `unknown` and `deprecated` produce review.  An attacker who can modify a status document in transit or at rest can therefore elevate a revoked agent to active, or deny service to a legitimate agent.
 
-For live status retrieval, implementations MUST protect status endpoint access using authenticated transport (HTTPS with valid certificates).  Implementations SHOULD use signed status documents or an equivalent integrity-protection mechanism before relying on status for high-assurance decisions.  An unsigned status document served over plain HTTPS is susceptible to modification by an adversary who can intercept or control the status endpoint.
+The v0.3.0-alpha.3 reference implementation supports optional and required EdDSA/JWS signatures over status documents.  The signature covers the JCS-canonicalized status document excluding the `signature` field.  Verifiers can require a valid status signature before accepting a status decision.
 
-Implementations MUST NOT claim compliance with a signed status document format based on the current alpha implementation alone.
+For live status retrieval, implementations MUST protect status endpoint access using authenticated transport (HTTPS with valid certificates).  Live status fetching without signature verification is not sufficient for high-assurance revocation enforcement; an unsigned status document served over plain HTTPS is susceptible to modification by an adversary who controls the status endpoint or a network path to it.
+
+Production deployments SHOULD use signed status documents.  Implementations SHOULD verify the status document signature before trusting a status decision in any high-assurance context.  The status signature key SHOULD be the same key declared in the Agent Card, or a key verifiably associated with the same agent identity.
+
+Implementations MUST NOT treat the current alpha signed status document support as a complete production mechanism.  Live DNS and HTTPS resolver behavior and long-term key management for status signing remain out of scope for this profile version.
 
 ## Test Keys
 
@@ -882,17 +890,18 @@ No such registrations are requested by this version of the document.
 
 This section records implementation status for informational purposes and is expected to be removed or updated before publication as an RFC.
 
-The AgIS v0.3.0-alpha.2 reference implementation includes:
+The AgIS v0.3.0-alpha.3 reference implementation includes:
 
 * a TypeScript SDK (`@epicortek/agis-sdk-ts`);
 * a CLI named `agis` (`@epicortek/agis-cli`);
-* 19 deterministic test vectors covering all features and selected negative cases;
+* 23 deterministic test vectors covering all features and selected negative cases;
 * offline identity verification;
 * Agent Card canonical hashing;
 * JWK thumbprint verification;
 * DNS Binding parsing;
 * signed Agent Card verification with explicit EdDSA algorithm verification;
 * status and revocation validation with a status decision policy (`active` → allow, `revoked`/`suspended`/`compromised` → deny, `unknown`/`deprecated` → review);
+* signed agent status document support: EdDSA/JWS signature generation and verification over JCS-canonicalized status documents; optional or required signature verification with `requireSignature` option;
 * Content-Digest validation;
 * HTTP Message Signature verification;
 * freshness and two-phase replay protection (check then commit only on allow);

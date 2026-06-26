@@ -1,6 +1,6 @@
 {
   "name": "@epicortek/agis-sdk-ts",
-  "version": "0.3.0-alpha.2",
+  "version": "0.3.0-alpha.3",
   "description": "TypeScript SDK and reference implementation for AgIS — Agent Identity System.",
   "author": "EPICORTEK Technologies Inc.",
   "contributors": [
@@ -48,7 +48,11 @@
     "test:vector:017:negative": "tsx src/test-vector-017-negative.ts",
     "test:vector:018:negative": "tsx src/test-vector-018-negative.ts",
     "test:vector:019": "tsx src/test-vector-019.ts",
-    "test:vectors": "npm run test:vector:001 && npm run test:vector:002 && npm run test:vector:003 && npm run test:vector:004 && npm run test:vector:004:tamper && npm run test:vector:005 && npm run test:vector:005:negative && npm run test:vector:006 && npm run test:vector:006:negative && npm run test:vector:007 && npm run test:vector:007:negative && npm run test:vector:008 && npm run test:vector:008:negative && npm run test:vector:009 && npm run test:vector:009:negative && npm run test:vector:010 && npm run test:vector:010:negative && npm run test:vector:011 && npm run test:vector:011:negative && npm run test:vector:012 && npm run test:vector:012:negative && npm run test:vector:013 && npm run test:vector:013:negative && npm run test:vector:014 && npm run test:vector:015:negative && npm run test:vector:016:negative && npm run test:vector:017:negative && npm run test:vector:018:negative && npm run test:vector:019 && npm run test:vector:001:skeleton"
+    "test:vector:020": "tsx src/test-vector-020.ts",
+    "test:vector:021:negative": "tsx src/test-vector-021-negative.ts",
+    "test:vector:022:negative": "tsx src/test-vector-022-negative.ts",
+    "test:vector:023:negative": "tsx src/test-vector-023-negative.ts",
+    "test:vectors": "npm run test:vector:001 && npm run test:vector:002 && npm run test:vector:003 && npm run test:vector:004 && npm run test:vector:004:tamper && npm run test:vector:005 && npm run test:vector:005:negative && npm run test:vector:006 && npm run test:vector:006:negative && npm run test:vector:007 && npm run test:vector:007:negative && npm run test:vector:008 && npm run test:vector:008:negative && npm run test:vector:009 && npm run test:vector:009:negative && npm run test:vector:010 && npm run test:vector:010:negative && npm run test:vector:011 && npm run test:vector:011:negative && npm run test:vector:012 && npm run test:vector:012:negative && npm run test:vector:013 && npm run test:vector:013:negative && npm run test:vector:014 && npm run test:vector:015:negative && npm run test:vector:016:negative && npm run test:vector:017:negative && npm run test:vector:018:negative && npm run test:vector:019 && npm run test:vector:020 && npm run test:vector:021:negative && npm run test:vector:022:negative && npm run test:vector:023:negative && npm run test:vector:001:skeleton"
   },
   "keywords": [
     "agis",
