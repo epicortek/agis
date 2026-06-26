@@ -17,6 +17,8 @@ export type AgisDelegationChainRequestVerificationResult = {
     scope: boolean;
     contentDigest: boolean;
     httpSignature: boolean;
+    /** True when the HTTP signature key was resolved from the final subject's known public keys. */
+    signatureKeyBound: boolean;
   };
   errors: string[];
   warnings: string[];
@@ -32,7 +34,20 @@ export async function verifyDelegationChainRequestOffline(input: {
   signatureInput: string;
   signature: string;
   publicJwkByAgentId: Record<string, Record<string, unknown>>;
-  requestSignerPublicJwk: Record<string, unknown>;
+  /**
+   * Preferred: the final subject's verified public key list (from their Agent Card or similar).
+   * When provided, the HTTP signature keyid is resolved from this list and key binding is enforced.
+   * The request is denied with DELEGATION_CHAIN_REQUEST_SIGNATURE_KEY_NOT_FOUND if the signing
+   * key is not found here.
+   */
+  finalSubjectPublicKeys?: Array<Record<string, unknown>>;
+  /**
+   * @deprecated Low-level primitive. Supply finalSubjectPublicKeys instead.
+   * When used without finalSubjectPublicKeys, no key binding against the final subject is
+   * performed. A warning is added to the result. Must not be used in production without prior
+   * identity binding.
+   */
+  requestSignerPublicJwk?: Record<string, unknown>;
   expectedRootIssuer: string;
   expectedAudience: string;
   requiredScopes: string[];
@@ -43,6 +58,7 @@ export async function verifyDelegationChainRequestOffline(input: {
     signatureInput,
     signature,
     publicJwkByAgentId,
+    finalSubjectPublicKeys,
     requestSignerPublicJwk,
     expectedRootIssuer,
     expectedAudience,
@@ -60,6 +76,7 @@ export async function verifyDelegationChainRequestOffline(input: {
     scope: false,
     contentDigest: false,
     httpSignature: false,
+    signatureKeyBound: false,
   };
 
   // ── Case-insensitive header map ────────────────────────────────────────────
@@ -73,15 +90,11 @@ export async function verifyDelegationChainRequestOffline(input: {
 
   // ── Required headers ───────────────────────────────────────────────────────
   if (!agisAgentHeader) {
-    errors.push(
-      "DELEGATION_CHAIN_REQUEST_AGENT_HEADER_MISSING: AgIS-Agent header is missing"
-    );
+    errors.push("DELEGATION_CHAIN_REQUEST_AGENT_HEADER_MISSING: AgIS-Agent header is missing");
     return { validDelegationChain: false, validRequest: false, decision: "deny", checks, errors, warnings };
   }
   if (!agisDelegationChainHeader) {
-    errors.push(
-      "DELEGATION_CHAIN_REQUEST_CHAIN_MISSING: AgIS-Delegation-Chain header is missing"
-    );
+    errors.push("DELEGATION_CHAIN_REQUEST_CHAIN_MISSING: AgIS-Delegation-Chain header is missing");
     return { validDelegationChain: false, validRequest: false, decision: "deny", checks, errors, warnings };
   }
 
@@ -142,9 +155,7 @@ export async function verifyDelegationChainRequestOffline(input: {
   // ── Content-Digest verification ───────────────────────────────────────────
   const contentDigestHeader = headerMap["content-digest"];
   if (!contentDigestHeader) {
-    errors.push(
-      "DELEGATION_CHAIN_REQUEST_CONTENT_DIGEST_INVALID: Content-Digest header is missing"
-    );
+    errors.push("DELEGATION_CHAIN_REQUEST_CONTENT_DIGEST_INVALID: Content-Digest header is missing");
   } else {
     const cdResult = verifySha256ContentDigest({
       body: request.body,
@@ -157,22 +168,59 @@ export async function verifyDelegationChainRequestOffline(input: {
     }
   }
 
-  // ── HTTP Message Signature verification ───────────────────────────────────
-  const httpSigResult = await verifyAgisHttpRequestSignature({
-    request: {
-      method: request.method,
-      targetUri: request.targetUri,
-      headers: request.headers,
-    },
-    publicJwk: requestSignerPublicJwk,
-    signatureInput,
-    signature,
-  });
+  // ── Resolve the HTTP signature public key ─────────────────────────────────
+  // Extract keyid from Signature-Input so we can look it up in the final subject's keys.
+  const keyIdMatch = signatureInput.match(/;keyid="([^"]+)"/);
+  const signingKeyId = keyIdMatch?.[1];
 
-  if (httpSigResult.valid) {
-    checks.httpSignature = true;
+  let resolvedPublicKeyJwk: Record<string, unknown> | undefined;
+
+  if (finalSubjectPublicKeys && finalSubjectPublicKeys.length > 0) {
+    // Preferred path: resolve key from the final subject's verified public keys
+    const keyEntry = signingKeyId
+      ? finalSubjectPublicKeys.find((k) => k.id === signingKeyId)
+      : undefined;
+
+    if (!keyEntry) {
+      errors.push(
+        `DELEGATION_CHAIN_REQUEST_SIGNATURE_KEY_NOT_FOUND: no public key with id="${signingKeyId ?? "(none)"}" found in final subject's public keys`
+      );
+      errors.push(`DELEGATION_CHAIN_REQUEST_SIGNER_KEY_NOT_BOUND_TO_FINAL_SUBJECT: HTTP signature key is not bound to the delegation chain final subject`);
+    } else {
+      resolvedPublicKeyJwk = keyEntry.public_key_jwk as Record<string, unknown>;
+      checks.signatureKeyBound = true;
+    }
+  } else if (requestSignerPublicJwk) {
+    // Deprecated low-level path: caller provides the key directly — no binding check
+    warnings.push(
+      "WARN_SIGNER_KEY_NOT_BOUND: requestSignerPublicJwk was used without finalSubjectPublicKeys. " +
+      "No key binding against the delegation chain final subject was performed. " +
+      "This is a low-level primitive and must not be used without prior identity binding."
+    );
+    resolvedPublicKeyJwk = requestSignerPublicJwk;
+    // signatureKeyBound remains false
   } else {
-    errors.push(`DELEGATION_CHAIN_REQUEST_HTTP_SIGNATURE_INVALID: ${httpSigResult.error}`);
+    errors.push("DELEGATION_CHAIN_REQUEST_SIGNATURE_KEY_NOT_FOUND: no public key provided for HTTP signature verification");
+  }
+
+  // ── HTTP Message Signature verification ───────────────────────────────────
+  if (resolvedPublicKeyJwk) {
+    const httpSigResult = await verifyAgisHttpRequestSignature({
+      request: {
+        method: request.method,
+        targetUri: request.targetUri,
+        headers: request.headers,
+      },
+      publicJwk: resolvedPublicKeyJwk,
+      signatureInput,
+      signature,
+    });
+
+    if (httpSigResult.valid) {
+      checks.httpSignature = true;
+    } else {
+      errors.push(`DELEGATION_CHAIN_REQUEST_HTTP_SIGNATURE_INVALID: ${httpSigResult.error}`);
+    }
   }
 
   // ── Final result ──────────────────────────────────────────────────────────

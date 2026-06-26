@@ -145,12 +145,15 @@ const AGENT_ID_MAP = {
   "agent://example.com/invoice-worker": pubJwk,
 };
 
+// Preferred API: pass final subject's public keys for key binding
+const finalSubjectPublicKeys = [{ id: "key-2026-01", public_key_jwk: pubJwk }];
+
 const result = await verifyDelegationChainRequestOffline({
   request,
   signatureInput,
   signature,
   publicJwkByAgentId: AGENT_ID_MAP,
-  requestSignerPublicJwk: pubJwk,
+  finalSubjectPublicKeys,
   expectedRootIssuer: chainExpected.root_issuer as string,
   expectedAudience: chainExpected.audience as string,
   requiredScopes: chainExpected.required_scopes as string[],

@@ -112,12 +112,15 @@ console.log("");
 
 // ── Verify ────────────────────────────────────────────────────────────────
 const verifierTime = "2026-06-23T18:35:00Z";
+// Preferred API: pass acting subject's public keys for key binding
+const actingSubjectPublicKeys = [{ id: "key-2026-01", public_key_jwk: pubJwk }];
+
 const result = await verifyDelegatedRequestOffline({
   request,
   signatureInput,
   signature,
   delegationPublicJwk: pubJwk,
-  requestSignerPublicJwk: pubJwk,
+  actingSubjectPublicKeys,
   expectedIssuer: expected.issuer as string,
   expectedAudience: expected.audience as string,
   requiredScopes: expected.required_scopes as string[],

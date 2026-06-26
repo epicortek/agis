@@ -45,7 +45,13 @@ export function buildReplayKey(input: {
   return `${agentId}::unknown`;
 }
 
-export function validateReplayProtection(input: {
+/**
+ * Phase 1: Check whether a replay key has already been seen.
+ *
+ * Does NOT commit the key to the cache. Call commitReplayProtection() separately
+ * after all other verification checks pass to avoid burning the nonce on invalid requests.
+ */
+export function checkReplayProtection(input: {
   agentId: string;
   nonce?: string;
   requestId?: string;
@@ -83,6 +89,40 @@ export function validateReplayProtection(input: {
     };
   }
 
-  cache.add(replayKey);
+  // Key has not been seen — return valid but do NOT add to cache yet.
   return { valid: true, replayKey };
+}
+
+/**
+ * Phase 2: Commit a previously checked replay key to the cache.
+ *
+ * Call this only after all cryptographic and policy checks have passed.
+ * This ensures that a nonce is not consumed by an invalid or rejected request.
+ */
+export function commitReplayProtection(input: {
+  replayKey: string;
+  cache: InMemoryReplayCache;
+}): void {
+  input.cache.add(input.replayKey);
+}
+
+/**
+ * Backward-compatible single-phase wrapper: check + commit atomically.
+ *
+ * For new code, prefer checkReplayProtection() + commitReplayProtection() separately.
+ */
+export function validateReplayProtection(input: {
+  agentId: string;
+  nonce?: string;
+  requestId?: string;
+  signature?: string;
+  cache: InMemoryReplayCache;
+  requireNonceOrRequestId?: boolean;
+}): AgisReplayProtectionResult {
+  const checkResult = checkReplayProtection(input);
+  if (!checkResult.valid) {
+    return checkResult;
+  }
+  commitReplayProtection({ replayKey: checkResult.replayKey, cache: input.cache });
+  return checkResult;
 }

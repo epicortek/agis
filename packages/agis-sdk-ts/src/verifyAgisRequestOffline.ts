@@ -2,7 +2,11 @@ import { verifyAgentOffline } from "./verifyAgentOffline.js";
 import { verifySha256ContentDigest } from "./contentDigest.js";
 import { verifyAgisHttpRequestSignature } from "./httpMessageSignature.js";
 import { validateRequestFreshness } from "./requestFreshness.js";
-import { validateReplayProtection, InMemoryReplayCache } from "./replayProtection.js";
+import {
+  checkReplayProtection,
+  commitReplayProtection,
+  InMemoryReplayCache,
+} from "./replayProtection.js";
 
 export { InMemoryReplayCache };
 
@@ -81,7 +85,9 @@ export async function verifyAgisRequestOffline(input: {
     httpSignature: false,
   };
 
-  const identityErrors = identityResult.errors.filter((e) => !e.startsWith("VERIFY_AGENT_REVOKED"));
+  const identityErrors = identityResult.errors.filter(
+    (e) => !e.startsWith("VERIFY_AGENT_REVOKED") && !e.startsWith("VERIFY_AGENT_DENIED") && !e.startsWith("VERIFY_AGENT_REVIEW")
+  );
   if (!identityResult.validIdentity || identityErrors.length > 0) {
     errors.push(
       `REQUEST_IDENTITY_VERIFICATION_FAILED: ${identityErrors.join("; ") || "identity could not be verified"}`
@@ -145,7 +151,7 @@ export async function verifyAgisRequestOffline(input: {
     }
   }
 
-  // ── Step 7: Revocation ────────────────────────────────────────────────────
+  // ── Step 7: Status / revocation ───────────────────────────────────────────
   if (identityResult.revoked) {
     errors.push("REQUEST_AGENT_REVOKED: agent is revoked — request is cryptographically valid but access denied");
   }
@@ -165,7 +171,10 @@ export async function verifyAgisRequestOffline(input: {
     }
   }
 
-  // ── Step 9: Replay protection (optional) ──────────────────────────────────
+  // ── Step 9: Replay protection — two-phase ─────────────────────────────────
+  // Phase 1: check only (do NOT commit nonce until all other checks pass).
+  let pendingReplayKey: string | undefined;
+
   if (replayCache !== undefined || requireReplayProtection) {
     const nonce = headerMap["agis-nonce"];
     const requestId = headerMap["agis-request-id"];
@@ -178,7 +187,7 @@ export async function verifyAgisRequestOffline(input: {
         "REQUEST_REPLAY_PROTECTION_REQUIRED: nonce (AgIS-Nonce) or request ID (AgIS-Request-Id) is required in this mode"
       );
     } else if (replayCache) {
-      const replayResult = validateReplayProtection({
+      const replayCheckResult = checkReplayProtection({
         agentId: identityResult.agentId ?? agisAgentHeader ?? "",
         nonce,
         requestId,
@@ -186,16 +195,19 @@ export async function verifyAgisRequestOffline(input: {
         cache: replayCache,
         requireNonceOrRequestId: needNonce,
       });
-      if (replayResult.valid) {
+      if (replayCheckResult.valid) {
+        // Keep track of the key to commit after all checks pass
+        pendingReplayKey = replayCheckResult.replayKey;
+        // Mark as passed provisionally — will be confirmed below
         checks.replayProtection = true;
       } else {
         checks.replayProtection = false;
-        if (replayResult.error.startsWith("REPLAY_DETECTED")) {
-          errors.push(`REQUEST_REPLAY_DETECTED: ${replayResult.error}`);
-        } else if (replayResult.error.startsWith("REPLAY_NONCE_REQUIRED")) {
-          errors.push(`REQUEST_REPLAY_PROTECTION_REQUIRED: ${replayResult.error}`);
+        if (replayCheckResult.error.startsWith("REPLAY_DETECTED")) {
+          errors.push(`REQUEST_REPLAY_DETECTED: ${replayCheckResult.error}`);
+        } else if (replayCheckResult.error.startsWith("REPLAY_NONCE_REQUIRED")) {
+          errors.push(`REQUEST_REPLAY_PROTECTION_REQUIRED: ${replayCheckResult.error}`);
         } else {
-          errors.push(`REQUEST_REPLAY_DETECTED: ${replayResult.error}`);
+          errors.push(`REQUEST_REPLAY_DETECTED: ${replayCheckResult.error}`);
         }
       }
     }
@@ -215,6 +227,12 @@ export async function verifyAgisRequestOffline(input: {
     decision = "allow";
   } else {
     decision = "deny";
+  }
+
+  // ── Phase 2: Commit replay nonce ONLY on success ──────────────────────────
+  // The nonce is not burned if identity, content-digest, signature, freshness, or status checks fail.
+  if (decision === "allow" && pendingReplayKey && replayCache) {
+    commitReplayProtection({ replayKey: pendingReplayKey, cache: replayCache });
   }
 
   return {

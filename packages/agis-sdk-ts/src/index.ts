@@ -8,7 +8,14 @@ export * from "./contentDigest.js";
 export * from "./httpMessageSignature.js";
 export * from "./verifyAgisRequestOffline.js";
 export * from "./requestFreshness.js";
-export * from "./replayProtection.js";
+export {
+  InMemoryReplayCache,
+  buildReplayKey,
+  checkReplayProtection,
+  commitReplayProtection,
+  validateReplayProtection,
+} from "./replayProtection.js";
+export type { AgisReplayProtectionResult } from "./replayProtection.js";
 export * from "./delegationToken.js";
 export * from "./verifyDelegatedRequestOffline.js";
 export * from "./delegationChain.js";

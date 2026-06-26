@@ -4,7 +4,8 @@
 
 | Version | Status |
 |---------|--------|
-| `0.2.2-alpha.x` | Experimental / pre-release. Not recommended for production use. |
+| `0.3.0-alpha.x` | Experimental / pre-release. Active development. Not recommended for production use. |
+| `0.2.2-alpha.x` | Previous experimental. No further security patches planned. |
 
 No production-stable release has been made yet. Breaking changes may occur in any pre-release version.
 

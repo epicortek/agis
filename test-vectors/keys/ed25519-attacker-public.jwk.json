@@ -1,0 +1,6 @@
+{
+  "_comment": "TEST ONLY — NOT FOR PRODUCTION USE. Attacker public key for negative test vectors.",
+  "crv": "Ed25519",
+  "x": "hZZTgoU5fzMYpA1xKK1Qh_ysP7SHYW1i2ruTCToT7_o",
+  "kty": "OKP"
+}

@@ -65,11 +65,44 @@ export async function verifyAgentCardSignature(input: {
     return { valid: false, error: "signature missing required fields (type, alg, key_id, value)" };
   }
 
+  // Validate sig.type — accept both "jws" and "JWS" for alpha compatibility
+  const sigTypeLower = String(sig.type).toLowerCase();
+  if (sigTypeLower !== "jws") {
+    return { valid: false, error: `AGENTCARD_SIG_TYPE_INVALID: expected "jws" or "JWS", got "${sig.type}"` };
+  }
+
+  // Validate sig.alg
+  if (sig.alg !== "EdDSA") {
+    return { valid: false, error: `AGENTCARD_SIG_ALG_INVALID: expected "EdDSA", got "${sig.alg}"` };
+  }
+
   try {
     const cleanJwk = stripNonJwkFields(publicJwk);
     const publicKey = await importJWK(cleanJwk, "EdDSA");
 
-    const { payload, protectedHeader } = await compactVerify(sig.value, publicKey);
+    // Restrict jose to EdDSA only — rejects any token whose protected header uses a different alg
+    const { payload, protectedHeader } = await compactVerify(sig.value, publicKey, {
+      algorithms: ["EdDSA"],
+    });
+
+    // Validate protected header alg
+    const hdr = protectedHeader as Record<string, unknown>;
+    if (hdr.alg !== "EdDSA") {
+      return {
+        valid: false,
+        protectedHeader,
+        error: `AGENTCARD_PROTECTED_ALG_INVALID: expected "EdDSA", got "${hdr.alg}"`,
+      };
+    }
+
+    // If protected header has kid, it must equal sig.key_id
+    if (hdr.kid !== undefined && hdr.kid !== sig.key_id) {
+      return {
+        valid: false,
+        protectedHeader,
+        error: `AGENTCARD_KID_MISMATCH: protected header kid="${hdr.kid}" does not match sig.key_id="${sig.key_id}"`,
+      };
+    }
 
     const decodedPayload = new TextDecoder().decode(payload);
     const recomputed = canonicalizeAgentCard(signedAgentCard);

@@ -73,7 +73,7 @@
       "description": "JWS-style signature over the canonical form of this agent card.",
       "required": ["type", "alg", "key_id", "value"],
       "properties": {
-        "type": { "type": "string", "enum": ["JWS"] },
+        "type": { "type": "string", "enum": ["JWS", "jws"], "description": "Both uppercase 'JWS' and lowercase 'jws' are accepted for alpha compatibility." },
         "alg": { "type": "string" },
         "key_id": { "type": "string" },
         "value": { "type": "string", "description": "Base64url-encoded JWS compact or detached signature." }

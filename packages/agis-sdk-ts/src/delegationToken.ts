@@ -74,7 +74,10 @@ export async function verifyDelegationToken(input: {
   let payload: Record<string, unknown>;
   try {
     const publicKey = await importJWK(stripNonJwkFields(publicJwk), "EdDSA");
-    const { payload: rawPayload } = await compactVerify(token, publicKey);
+    // Restrict jose to EdDSA only — rejects tokens signed with any other algorithm
+    const { payload: rawPayload } = await compactVerify(token, publicKey, {
+      algorithms: ["EdDSA"],
+    });
     payload = JSON.parse(new TextDecoder().decode(rawPayload)) as Record<string, unknown>;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
