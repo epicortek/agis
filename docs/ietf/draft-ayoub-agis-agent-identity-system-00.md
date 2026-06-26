@@ -372,7 +372,7 @@ A verifier SHOULD reject a DNS Binding if the `jkt` parameter is present and doe
 
 # Signed Agent Cards
 
-An Agent Card MAY include a top-level `signature` member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.2.2 reference implementation uses a compact JWS form with the following protected header:
+An Agent Card MAY include a top-level `signature` member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.3.0-alpha.2 reference implementation uses a compact JWS form with the following protected header:
 
 ```json
 {
@@ -639,7 +639,7 @@ A verifier MUST reject the request if the `AgIS-Agent` value does not match the 
 
 A verifier MUST reject the request if the delegation token is changed after the HTTP signature is produced.
 
-A verifier MUST reject a delegated signed request unless the HTTP message signature key is bound to the delegation subject.  The binding MUST be established by resolving the request signature `keyid` against the verified key set for the delegation subject, such as the subject's verified Agent Card or equivalent verified identity evidence.
+A verifier MUST reject a delegated signed request unless the HTTP message signature key is bound to the delegation subject, as established by that subject's verified Agent Card key set or equivalent verified identity evidence.
 
 A verifier MUST NOT accept a delegated signed request merely because both of the following are true:
 
@@ -680,7 +680,7 @@ The following signature components are REQUIRED for a delegation-chain request:
 "date"
 ```
 
-A verifier MUST reject a chained delegated request unless the HTTP message signature key is bound to the final subject of the delegation chain.  The final subject is the agent that acts on the delegated authority.  The request signature `keyid` MUST be resolved from the verified key set of that final subject.
+A verifier MUST reject a delegation-chain signed request unless the HTTP message signature key is bound to the final subject of the delegation chain, as established by that final subject's verified Agent Card key set or equivalent verified identity evidence.  The final subject is the agent that acts on the delegated authority.
 
 A verifier MUST NOT accept a chained delegated request merely because the delegation chain verifies and the HTTP request signature is cryptographically valid under some caller-supplied key.  Both the chain and the request signer MUST be traceable to the same final subject's verified key material.
 

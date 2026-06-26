@@ -113,7 +113,7 @@ See [`docs/ANS_COMPATIBILITY.md`](docs/ANS_COMPATIBILITY.md) for a detailed mapp
 
 ## Current implementation status
 
-AgIS v0.3.0-alpha.0 is implemented as an offline TypeScript reference SDK with deterministic test vectors.
+AgIS v0.3.0-alpha.2 is implemented as an offline TypeScript reference SDK with deterministic test vectors.
 
 | Component | Status |
 |---|---|
