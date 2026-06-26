@@ -9,7 +9,8 @@
 <meta content="
        This document specifies AgIS, the Agent Identity System, a DNS-backed identity and verification profile for AI agents, autonomous software agents, and agentic services operating on the existing web. 
        AgIS defines an agent identifier form, DNS TXT bindings, Agent Cards, key thumbprints, status and revocation documents, signed HTTP request verification, replay protection, delegation tokens, and delegation chains.  The design intentionally reuses existing Internet mechanisms, including DNS, HTTPS well-known resources, JSON Web Keys, JSON canonicalization, HTTP Message Signatures, and HTTP digest fields. 
-       This document describes the v0.2.2 verification profile and the behavior exercised by the AgIS v0.2.2-alpha.1 reference implementation and deterministic test vectors.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure. 
+       This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.2 reference implementation and its 19 deterministic test vectors.  That implementation enforces delegated signer-key binding by default, uses a two-phase replay protection API, and performs explicit EdDSA algorithm verification.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure. 
+       AgIS is designed to be compatible with agent naming services such as Linux Foundation ANS and similar systems.  AgIS is not affiliated with, endorsed by, or a replacement for Linux Foundation ANS or any global naming authority.  AgIS defines verification, governance, and request-signing behavior that operates over identity evidence that may originate from ANS or any comparable naming layer. 
     " name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
 <meta content="agent identity" name="keyword">
@@ -1228,7 +1229,7 @@ li > p:last-of-type:only-child {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ayoub</td>
-<td class="center">Expires 27 December 2026</td>
+<td class="center">Expires 28 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1241,12 +1242,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-ayoub-agis-agent-identity-system-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-25" class="published">25 June 2026</time>
+<time datetime="2026-06-26" class="published">26 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-27">27 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-28">28 December 2026</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1261,7 +1262,8 @@ li > p:last-of-type:only-child {
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document specifies AgIS, the Agent Identity System, a DNS-backed identity and verification profile for AI agents, autonomous software agents, and agentic services operating on the existing web.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">AgIS defines an agent identifier form, DNS TXT bindings, Agent Cards, key thumbprints, status and revocation documents, signed HTTP request verification, replay protection, delegation tokens, and delegation chains.  The design intentionally reuses existing Internet mechanisms, including DNS, HTTPS well-known resources, JSON Web Keys, JSON canonicalization, HTTP Message Signatures, and HTTP digest fields.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
-<p id="section-abstract-3">This document describes the v0.2.2 verification profile and the behavior exercised by the AgIS v0.2.2-alpha.1 reference implementation and deterministic test vectors.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.2 reference implementation and its 19 deterministic test vectors.  That implementation enforces delegated signer-key binding by default, uses a two-phase replay protection API, and performs explicit EdDSA algorithm verification.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+<p id="section-abstract-4">AgIS is designed to be compatible with agent naming services such as Linux Foundation ANS and similar systems.  AgIS is not affiliated with, endorsed by, or a replacement for Linux Foundation ANS or any global naming authority.  AgIS defines verification, governance, and request-signing behavior that operates over identity evidence that may originate from ANS or any comparable naming layer.<a href="#section-abstract-4" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1282,7 +1284,7 @@ li > p:last-of-type:only-child {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 27 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 28 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1405,13 +1407,16 @@ li > p:last-of-type:only-child {
                 <p id="section-toc.1-1.23.2.8.1"><a href="#section-23.8" class="auto internal xref">23.8</a>.  <a href="#name-signature-confusion" class="internal xref">Signature Confusion</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23.2.9">
-                <p id="section-toc.1-1.23.2.9.1"><a href="#section-23.9" class="auto internal xref">23.9</a>.  <a href="#name-delegation-confusion" class="internal xref">Delegation Confusion</a></p>
+                <p id="section-toc.1-1.23.2.9.1"><a href="#section-23.9" class="auto internal xref">23.9</a>.  <a href="#name-delegation-confusion-and-si" class="internal xref">Delegation Confusion and Signer-Key Binding</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23.2.10">
-                <p id="section-toc.1-1.23.2.10.1"><a href="#section-23.10" class="auto internal xref">23.10</a>. <a href="#name-test-keys" class="internal xref">Test Keys</a></p>
+                <p id="section-toc.1-1.23.2.10.1"><a href="#section-23.10" class="auto internal xref">23.10</a>. <a href="#name-status-document-integrity" class="internal xref">Status Document Integrity</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23.2.11">
-                <p id="section-toc.1-1.23.2.11.1"><a href="#section-23.11" class="auto internal xref">23.11</a>. <a href="#name-local-authorization" class="internal xref">Local Authorization</a></p>
+                <p id="section-toc.1-1.23.2.11.1"><a href="#section-23.11" class="auto internal xref">23.11</a>. <a href="#name-test-keys" class="internal xref">Test Keys</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23.2.12">
+                <p id="section-toc.1-1.23.2.12.1"><a href="#section-23.12" class="auto internal xref">23.12</a>. <a href="#name-local-authorization" class="internal xref">Local Authorization</a></p>
 </li>
             </ul>
 </li>
@@ -1490,7 +1495,8 @@ li > p:last-of-type:only-child {
       </ul>
 <p id="section-1-4">AgIS addresses these questions by defining a narrow identity and verification profile that can be deployed using ordinary DNS records and HTTPS resources.  It is intended to be small enough for developer tooling and deterministic enough for independent test-vector validation.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">AgIS is not an authorization framework by itself.  A verifier MAY use AgIS verification results as input to a local authorization policy, but final authorization decisions remain local to the relying party.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">AgIS is also not a claim that an agent is safe, truthful, lawful, beneficial, or aligned.  It verifies identity bindings, key material, request signatures, freshness signals, revocation status, and delegation constraints.  It does not certify the behavior or intent of the agent.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-6">AgIS is not a global naming service.  Agent naming, discovery, and identity evidence MAY be provided by external naming systems such as Linux Foundation ANS or similar agent name services.  AgIS defines the verification, governance, signed request, delegation, and replay protection behavior that operates over such identity evidence once it is available to a verifier.  AgIS is not affiliated with, endorsed by, or a replacement for any such naming authority.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">AgIS is also not a claim that an agent is safe, truthful, lawful, beneficial, or aligned.  It verifies identity bindings, key material, request signatures, freshness signals, revocation status, and delegation constraints.  It does not certify the behavior or intent of the agent.<a href="#section-1-7" class="pilcrow">¶</a></p>
 </section>
 <section id="section-2">
       <h2 id="name-goals">
@@ -1860,7 +1866,7 @@ dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
       <h2 id="name-signed-agent-cards">
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-signed-agent-cards" class="section-name selfRef">Signed Agent Cards</a>
       </h2>
-<p id="section-12-1">An Agent Card MAY include a top-level <code>signature</code> member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.2.2 reference implementation uses a compact JWS form with the following protected header:<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-1">An Agent Card MAY include a top-level <code>signature</code> member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.3.0-alpha.2 reference implementation uses a compact JWS form with the following protected header:<a href="#section-12-1" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-12-2">
 <pre>
 {
@@ -2109,6 +2115,7 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
       </ul>
 <p id="section-16-9">A verifier MUST reject a high-assurance request if the nonce is missing.<a href="#section-16-9" class="pilcrow">¶</a></p>
 <p id="section-16-10">A verifier MUST reject a high-assurance request if the nonce has already been observed within the replay-protection window.  Nonces SHOULD be retained for at least the configured freshness window plus an allowance for clock skew.<a href="#section-16-10" class="pilcrow">¶</a></p>
+<p id="section-16-11">A verifier MUST NOT commit a nonce to the replay-protection cache until all cryptographic checks --- including the HTTP message signature --- have passed.  Committing a nonce before signature verification would allow an attacker to deny service by burning valid nonces using forged or malformed requests.  The two-phase approach --- checking replay state before cryptographic verification, but committing only after all checks succeed --- is REQUIRED for high-assurance replay protection.<a href="#section-16-11" class="pilcrow">¶</a></p>
 </section>
 <section id="section-17">
       <h2 id="name-delegation-tokens">
@@ -2205,6 +2212,15 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 </div>
 <p id="section-18-6">A verifier MUST reject the request if the <code>AgIS-Agent</code> value does not match the delegation token subject.<a href="#section-18-6" class="pilcrow">¶</a></p>
 <p id="section-18-7">A verifier MUST reject the request if the delegation token is changed after the HTTP signature is produced.<a href="#section-18-7" class="pilcrow">¶</a></p>
+<p id="section-18-8">A verifier MUST reject a delegated signed request unless the HTTP message signature key is bound to the delegation subject, as established by that subject's verified Agent Card key set or equivalent verified identity evidence.<a href="#section-18-8" class="pilcrow">¶</a></p>
+<p id="section-18-9">A verifier MUST NOT accept a delegated signed request merely because both of the following are true:<a href="#section-18-9" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-18-10.1">the delegation token is cryptographically valid, and<a href="#section-18-10.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-18-10.2">the HTTP request signature is cryptographically valid under some caller-supplied key.<a href="#section-18-10.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-18-11">The HTTP message signer key and the delegation subject MUST be verifiably bound to the same identity.  A valid delegation token and a valid request signature that were checked independently, without confirming that both refer to the same acting agent's key material, do not together constitute a valid delegated request.<a href="#section-18-11" class="pilcrow">¶</a></p>
 </section>
 <section id="section-19">
       <h2 id="name-delegation-chains">
@@ -2247,21 +2263,25 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 "date"
 </pre><a href="#section-19-7" class="pilcrow">¶</a>
 </div>
-<p id="section-19-8">A verifier MUST reject a delegation chain if:<a href="#section-19-8" class="pilcrow">¶</a></p>
+<p id="section-19-8">A verifier MUST reject a delegation-chain signed request unless the HTTP message signature key is bound to the final subject of the delegation chain, as established by that final subject's verified Agent Card key set or equivalent verified identity evidence.  The final subject is the agent that acts on the delegated authority.<a href="#section-19-8" class="pilcrow">¶</a></p>
+<p id="section-19-9">A verifier MUST NOT accept a chained delegated request merely because the delegation chain verifies and the HTTP request signature is cryptographically valid under some caller-supplied key.  Both the chain and the request signer MUST be traceable to the same final subject's verified key material.<a href="#section-19-9" class="pilcrow">¶</a></p>
+<p id="section-19-10">A verifier MUST reject a delegation chain if:<a href="#section-19-10" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-19-9.1">the chain order is reversed;<a href="#section-19-9.1" class="pilcrow">¶</a>
+<li class="normal" id="section-19-11.1">the chain order is reversed;<a href="#section-19-11.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-9.2">any link is broken;<a href="#section-19-9.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.2">any link is broken;<a href="#section-19-11.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-9.3">a downstream token attempts scope escalation;<a href="#section-19-9.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.3">a downstream token attempts scope escalation;<a href="#section-19-11.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-9.4">the acting agent does not match the final subject;<a href="#section-19-9.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.4">the acting agent does not match the final subject;<a href="#section-19-11.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-9.5">the required scope is not in the effective scope;<a href="#section-19-9.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.5">the required scope is not in the effective scope;<a href="#section-19-11.5" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-9.6">any token is expired;<a href="#section-19-9.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.6">any token is expired;<a href="#section-19-11.6" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-9.7">the chain field is modified after signing.<a href="#section-19-9.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.7">the chain field is modified after signing;<a href="#section-19-11.7" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-19-11.8">the HTTP message signature key is not bound to the final subject's verified key set.<a href="#section-19-11.8" class="pilcrow">¶</a>
 </li>
       </ul>
 </section>
@@ -2353,55 +2373,65 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
       <h2 id="name-deterministic-test-vectors">
 <a href="#section-22" class="section-number selfRef">22. </a><a href="#name-deterministic-test-vectors" class="section-name selfRef">Deterministic Test Vectors</a>
       </h2>
-<p id="section-22-1">The v0.2.2 reference implementation includes deterministic test vectors for:<a href="#section-22-1" class="pilcrow">¶</a></p>
+<p id="section-22-1">The v0.3.0-alpha.2 reference implementation includes 19 deterministic test vectors for:<a href="#section-22-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-22-2.1">Agent Card canonical hash;<a href="#section-22-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-22-2.1">Agent Card canonical hash (TV001);<a href="#section-22-2.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.2">skeleton Agent Card canonical hash;<a href="#section-22-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.2">JWK thumbprint (TV002);<a href="#section-22-2.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.3">JWK thumbprint;<a href="#section-22-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.3">DNS TXT Binding (TV003);<a href="#section-22-2.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.4">DNS TXT Binding;<a href="#section-22-2.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.4">signed Agent Card (TV004);<a href="#section-22-2.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.5">signed Agent Card;<a href="#section-22-2.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.5">Agent Card tampering --- negative (TV004-tamper);<a href="#section-22-2.5" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.6">Agent Card tampering;<a href="#section-22-2.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.6">Agent Status and revocation (TV005);<a href="#section-22-2.6" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.7">Agent Status and revocation;<a href="#section-22-2.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.7">invalid status documents --- negative (TV005-negative);<a href="#section-22-2.7" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.8">invalid status documents;<a href="#section-22-2.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.8">offline composite identity verification (TV006);<a href="#section-22-2.8" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.9">offline composite identity verification;<a href="#section-22-2.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.9">invalid composite verification cases --- negative (TV006-negative);<a href="#section-22-2.9" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.10">invalid composite verification cases;<a href="#section-22-2.10" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.10">Content-Digest (TV007);<a href="#section-22-2.10" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.11">Content-Digest;<a href="#section-22-2.11" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.11">invalid Content-Digest cases --- negative (TV007-negative);<a href="#section-22-2.11" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.12">invalid Content-Digest cases;<a href="#section-22-2.12" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.12">HTTP Message Signatures (TV008);<a href="#section-22-2.12" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.13">HTTP Message Signatures;<a href="#section-22-2.13" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.13">invalid HTTP signature cases --- negative (TV008-negative);<a href="#section-22-2.13" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.14">invalid HTTP signature cases;<a href="#section-22-2.14" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.14">offline signed request verification (TV009);<a href="#section-22-2.14" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.15">offline signed request verification;<a href="#section-22-2.15" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.15">invalid signed request cases --- negative (TV009-negative);<a href="#section-22-2.15" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.16">invalid signed request cases;<a href="#section-22-2.16" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.16">freshness and replay protection (TV010);<a href="#section-22-2.16" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.17">freshness and replay protection;<a href="#section-22-2.17" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.17">invalid freshness and replay cases --- negative (TV010-negative);<a href="#section-22-2.17" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.18">invalid freshness and replay cases;<a href="#section-22-2.18" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.18">single delegation token (TV011);<a href="#section-22-2.18" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.19">single delegation token;<a href="#section-22-2.19" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.19">invalid delegation token cases --- negative (TV011-negative);<a href="#section-22-2.19" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.20">invalid delegation token cases;<a href="#section-22-2.20" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.20">delegated signed request with signer-key binding (TV012);<a href="#section-22-2.20" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.21">delegated signed request;<a href="#section-22-2.21" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.21">invalid delegated request cases --- negative (TV012-negative);<a href="#section-22-2.21" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.22">invalid delegated request cases;<a href="#section-22-2.22" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.22">delegation chain signed request with final-subject key binding (TV013);<a href="#section-22-2.22" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.23">delegation chain signed request;<a href="#section-22-2.23" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.23">invalid delegation chain request cases --- negative (TV013-negative);<a href="#section-22-2.23" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-22-2.24">invalid delegation chain request cases.<a href="#section-22-2.24" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.24">status decision policy across all six status values (TV014);<a href="#section-22-2.24" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-22-2.25">delegated request with attacker key --- negative (TV015-negative);<a href="#section-22-2.25" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-22-2.26">chain delegated request with attacker key --- negative (TV016-negative);<a href="#section-22-2.26" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-22-2.27">replay nonce not committed on invalid signature --- negative (TV017-negative);<a href="#section-22-2.27" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-22-2.28">deprecated unbound signer key, deny by default --- negative (TV018-negative);<a href="#section-22-2.28" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-22-2.29">deprecated unbound signer key, explicit opt-in allows with warning (TV019).<a href="#section-22-2.29" class="pilcrow">¶</a>
 </li>
       </ul>
 <p id="section-22-3">Independent implementations SHOULD validate against the deterministic test vectors before claiming compatibility with this profile.<a href="#section-22-3" class="pilcrow">¶</a></p>
@@ -2464,23 +2494,41 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-23.8-1">Implementations MUST verify the expected signature label and covered components.  A signature over one set of components MUST NOT be accepted as proof over a different set of components.<a href="#section-23.8-1" class="pilcrow">¶</a></p>
 </section>
 <section id="section-23.9">
-        <h3 id="name-delegation-confusion">
-<a href="#section-23.9" class="section-number selfRef">23.9. </a><a href="#name-delegation-confusion" class="section-name selfRef">Delegation Confusion</a>
+        <h3 id="name-delegation-confusion-and-si">
+<a href="#section-23.9" class="section-number selfRef">23.9. </a><a href="#name-delegation-confusion-and-si" class="section-name selfRef">Delegation Confusion and Signer-Key Binding</a>
         </h3>
 <p id="section-23.9-1">Delegation tokens MUST be checked for issuer, subject, audience, scope, time validity, and <code>jti</code>.  A delegation token MUST NOT be treated as an unrestricted bearer credential.<a href="#section-23.9-1" class="pilcrow">¶</a></p>
 <p id="section-23.9-2">Delegation chains MUST preserve order and MUST prevent downstream scope escalation.<a href="#section-23.9-2" class="pilcrow">¶</a></p>
+<p id="section-23.9-3">A critical class of delegation confusion arises when a verifier checks the delegation token and the HTTP request signature independently without confirming that both are associated with the same acting agent's key material.  In such a case, an attacker may present a legitimate delegation token alongside an HTTP request signed by a different key --- a key that the attacker controls --- and thereby act on delegated authority without possessing the legitimate agent's signing key.<a href="#section-23.9-3" class="pilcrow">¶</a></p>
+<p id="section-23.9-4">To prevent this, implementations MUST bind:<a href="#section-23.9-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-23.9-5.1">the delegation token signature key to the delegation issuer's verified identity; and<a href="#section-23.9-5.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-23.9-5.2">the HTTP request signature key to the delegation subject's (or chain final subject's) verified identity.<a href="#section-23.9-5.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-23.9-6">The HTTP message signer key MUST be resolved from the delegation subject's verified key set.  A verifier MUST NOT derive an allow decision from the combination of a valid delegation token and a valid HTTP request signature unless both keys are bound to the corresponding agents' verified identity evidence.<a href="#section-23.9-6" class="pilcrow">¶</a></p>
+<p id="section-23.9-7">Failure to enforce this binding allows confused-deputy behavior, where the delegation grants authority over one agent and the request signature is produced by a different, potentially malicious party.<a href="#section-23.9-7" class="pilcrow">¶</a></p>
 </section>
 <section id="section-23.10">
-        <h3 id="name-test-keys">
-<a href="#section-23.10" class="section-number selfRef">23.10. </a><a href="#name-test-keys" class="section-name selfRef">Test Keys</a>
+        <h3 id="name-status-document-integrity">
+<a href="#section-23.10" class="section-number selfRef">23.10. </a><a href="#name-status-document-integrity" class="section-name selfRef">Status Document Integrity</a>
         </h3>
-<p id="section-23.10-1">The deterministic test keys included with the reference implementation are public test material.  They MUST NOT be used in production.<a href="#section-23.10-1" class="pilcrow">¶</a></p>
+<p id="section-23.10-1">The current alpha implementation validates status document structure and evaluates status decisions based on the declared status value.  The current AgIS profile does not yet define a signed status document format for production use.<a href="#section-23.10-1" class="pilcrow">¶</a></p>
+<p id="section-23.10-2">For live status retrieval, implementations MUST protect status endpoint access using authenticated transport (HTTPS with valid certificates).  Implementations SHOULD use signed status documents or an equivalent integrity-protection mechanism before relying on status for high-assurance decisions.  An unsigned status document served over plain HTTPS is susceptible to modification by an adversary who can intercept or control the status endpoint.<a href="#section-23.10-2" class="pilcrow">¶</a></p>
+<p id="section-23.10-3">Implementations MUST NOT claim compliance with a signed status document format based on the current alpha implementation alone.<a href="#section-23.10-3" class="pilcrow">¶</a></p>
 </section>
 <section id="section-23.11">
-        <h3 id="name-local-authorization">
-<a href="#section-23.11" class="section-number selfRef">23.11. </a><a href="#name-local-authorization" class="section-name selfRef">Local Authorization</a>
+        <h3 id="name-test-keys">
+<a href="#section-23.11" class="section-number selfRef">23.11. </a><a href="#name-test-keys" class="section-name selfRef">Test Keys</a>
         </h3>
-<p id="section-23.11-1">AgIS verification does not authorize an action by itself.  A relying party MUST apply local authorization policy after identity, request, freshness, status, and delegation checks.<a href="#section-23.11-1" class="pilcrow">¶</a></p>
+<p id="section-23.11-1">The deterministic test keys included with the reference implementation are public test material.  They MUST NOT be used in production.<a href="#section-23.11-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-23.12">
+        <h3 id="name-local-authorization">
+<a href="#section-23.12" class="section-number selfRef">23.12. </a><a href="#name-local-authorization" class="section-name selfRef">Local Authorization</a>
+        </h3>
+<p id="section-23.12-1">AgIS verification does not authorize an action by itself.  A relying party MUST apply local authorization policy after identity, request, freshness, status, and delegation checks.<a href="#section-23.12-1" class="pilcrow">¶</a></p>
 </section>
 </section>
 <section id="section-24">
@@ -2515,13 +2563,13 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <a href="#section-26" class="section-number selfRef">26. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
       </h2>
 <p id="section-26-1">This section records implementation status for informational purposes and is expected to be removed or updated before publication as an RFC.<a href="#section-26-1" class="pilcrow">¶</a></p>
-<p id="section-26-2">The AgIS v0.2.2-alpha.1 reference implementation includes:<a href="#section-26-2" class="pilcrow">¶</a></p>
+<p id="section-26-2">The AgIS v0.3.0-alpha.2 reference implementation includes:<a href="#section-26-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-26-3.1">a TypeScript SDK;<a href="#section-26-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-26-3.1">a TypeScript SDK (<code>@epicortek/agis-sdk-ts</code>);<a href="#section-26-3.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-26-3.2">a CLI named <code>agis</code>;<a href="#section-26-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.2">a CLI named <code>agis</code> (<code>@epicortek/agis-cli</code>);<a href="#section-26-3.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-26-3.3">deterministic test vectors;<a href="#section-26-3.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.3">19 deterministic test vectors covering all features and selected negative cases;<a href="#section-26-3.3" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-26-3.4">offline identity verification;<a href="#section-26-3.4" class="pilcrow">¶</a>
 </li>
@@ -2531,24 +2579,34 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 </li>
         <li class="normal" id="section-26-3.7">DNS Binding parsing;<a href="#section-26-3.7" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-26-3.8">signed Agent Card verification;<a href="#section-26-3.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.8">signed Agent Card verification with explicit EdDSA algorithm verification;<a href="#section-26-3.8" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-26-3.9">status and revocation validation;<a href="#section-26-3.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.9">status and revocation validation with a status decision policy (<code>active</code> allows, <code>revoked</code>/<code>suspended</code>/<code>compromised</code> deny, <code>unknown</code>/<code>deprecated</code> review);<a href="#section-26-3.9" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-26-3.10">Content-Digest validation;<a href="#section-26-3.10" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-26-3.11">HTTP Message Signature verification;<a href="#section-26-3.11" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-26-3.12">freshness and replay protection;<a href="#section-26-3.12" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.12">freshness and two-phase replay protection (check then commit only on allow);<a href="#section-26-3.12" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-26-3.13">single delegation token verification;<a href="#section-26-3.13" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-26-3.14">delegated signed request verification;<a href="#section-26-3.14" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.14">delegated signed request verification with signer-key binding enforced by default;<a href="#section-26-3.14" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-26-3.15">delegation chain verification.<a href="#section-26-3.15" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.15">delegation chain verification with final-subject signer-key binding enforced by default.<a href="#section-26-3.15" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-26-4">The implementation does not yet define production live DNS or HTTPS resolver behavior.<a href="#section-26-4" class="pilcrow">¶</a></p>
+<p id="section-26-4">The implementation enforces that delegated request verification produces an allow decision only when the HTTP message signature key is demonstrably bound to the delegation subject's verified identity.  A deprecated compatibility path (<code>requestSignerPublicJwk</code> without <code>actingSubjectPublicKeys</code>) requires an explicit caller opt-in flag (<code>allowUnboundDeprecatedSignerKey: true</code>) and produces a warning; without the opt-in, the decision is deny.<a href="#section-26-4" class="pilcrow">¶</a></p>
+<p id="section-26-5">The implementation is positioned as an ANS-compatible verification and governance layer.  It is not affiliated with or endorsed by Linux Foundation ANS.<a href="#section-26-5" class="pilcrow">¶</a></p>
+<p id="section-26-6">The implementation does not yet define:<a href="#section-26-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-26-7.1">production live DNS or HTTPS resolver behavior;<a href="#section-26-7.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-26-7.2">a signed status document format;<a href="#section-26-7.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-26-7.3">a production trust network or global trust root.<a href="#section-26-7.3" class="pilcrow">¶</a>
+</li>
+      </ul>
 </section>
 <section id="section-27">
       <h2 id="name-acknowledgements">
@@ -2618,7 +2676,7 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <dl class="references">
 <dt id="AGIS-IMPL">[AGIS-IMPL]</dt>
       <dd>
-<span class="refAuthor">EPICORTEK Technologies Inc.</span>, <span class="refTitle">"AgIS v0.2.2-alpha.1 Reference Implementation, CLI, and Deterministic Test Vectors"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://github.com/epicortek/agis">https://github.com/epicortek/agis</a>&gt;</span>. </dd>
+<span class="refAuthor">EPICORTEK Technologies Inc.</span>, <span class="refTitle">"AgIS v0.3.0-alpha.2 Reference Implementation, CLI, and Deterministic Test Vectors"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://github.com/epicortek/agis">https://github.com/epicortek/agis</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="AGIS-SDK">[AGIS-SDK]</dt>
       <dd>
