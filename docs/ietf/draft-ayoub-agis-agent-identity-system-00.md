@@ -42,7 +42,7 @@ normative:
 
 informative:
   AGIS-IMPL:
-    title: "AgIS v0.3.0-alpha.2 Reference Implementation, CLI, and Deterministic Test Vectors"
+    title: "AgIS v0.3.0-alpha.3 Reference Implementation, CLI, and Deterministic Test Vectors"
     author:
       - organization: "EPICORTEK Technologies Inc."
     date: 2026
@@ -67,7 +67,9 @@ This document specifies AgIS, the Agent Identity System, a DNS-backed identity a
 
 AgIS defines an agent identifier form, DNS TXT bindings, Agent Cards, key thumbprints, status and revocation documents, signed HTTP request verification, replay protection, delegation tokens, and delegation chains.  The design intentionally reuses existing Internet mechanisms, including DNS, HTTPS well-known resources, JSON Web Keys, JSON canonicalization, HTTP Message Signatures, and HTTP digest fields.
 
-This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.2 reference implementation and its 19 deterministic test vectors.  That implementation enforces delegated signer-key binding by default, uses a two-phase replay protection API, and performs explicit EdDSA algorithm verification.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure.
+This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.3 reference implementation and its 23 deterministic test vectors.  That implementation includes signed Agent Cards, HTTP Message Signature verification, two-phase replay protection, delegation signer-key binding enforced by default, and signed agent status document support.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure.
+
+This is an individual Internet-Draft and a work in progress.  It has not been approved by the IETF, does not represent an IETF standard or RFC, and has not been adopted by any IETF working group.
 
 AgIS is designed to be compatible with agent naming services such as Linux Foundation ANS and similar systems.  AgIS is not affiliated with, endorsed by, or a replacement for Linux Foundation ANS or any global naming authority.  AgIS defines verification, governance, and request-signing behavior that operates over identity evidence that may originate from ANS or any comparable naming layer.
 
@@ -93,6 +95,8 @@ Existing web identity mechanisms are generally designed for human users, applica
 AgIS addresses these questions by defining a narrow identity and verification profile that can be deployed using ordinary DNS records and HTTPS resources.  It is intended to be small enough for developer tooling and deterministic enough for independent test-vector validation.
 
 AgIS is not an authorization framework by itself.  A verifier MAY use AgIS verification results as input to a local authorization policy, but final authorization decisions remain local to the relying party.
+
+This document is an individual Internet-Draft submitted for community review.  It is a work in progress, has not been approved by the IETF, does not represent an IETF standard, and has not been adopted by any IETF working group.  The reference implementation is experimental alpha software.
 
 AgIS is not a global naming service.  Agent naming, discovery, and identity evidence MAY be provided by external naming systems such as Linux Foundation ANS or similar agent name services.  AgIS defines the verification, governance, signed request, delegation, and replay protection behavior that operates over such identity evidence once it is available to a verifier.  AgIS is not affiliated with, endorsed by, or a replacement for any such naming authority.
 
@@ -171,25 +175,25 @@ Delegation Chain:
 
 An AgIS Agent Identifier has the following form:
 
-```text
+~~~text
 agent://{domain}/{agent-name}
-```
+~~~
 
 For example:
 
-```text
+~~~text
 agent://example.com/support-agent
-```
+~~~
 
 The `domain` component identifies the DNS domain responsible for publishing the agent binding.  The `agent-name` component identifies the agent under that domain.
 
 The following ABNF defines the v0.2.2 Agent Identifier profile:
 
-```abnf
+~~~abnf
 agent-id     = "agent://" domain "/" agent-name
 domain       = 1*(ALPHA / DIGIT / "-" / ".")
 agent-name   = 1*(ALPHA / DIGIT / "-" / "_" / ".")
-```
+~~~
 
 Implementations MUST compare the scheme component case-insensitively.  Implementations MUST compare the domain component using the normal DNS case-insensitive comparison rules.  Implementations MUST compare the agent-name component byte-for-byte after URI parsing.
 
@@ -201,9 +205,9 @@ This document does not request registration of the `agent` URI scheme at this ti
 
 An Agent Identifier maps to a default HTTPS publication location:
 
-```text
+~~~text
 https://{domain}/.well-known/agis/id/{agent-name}
-```
+~~~
 
 This HTTPS equivalent identifier is intended for human inspection, linking, debugging, and future resolver behavior.  The v0.2.2 profile does not require live fetching of this location for offline verification.
 
@@ -211,9 +215,9 @@ This HTTPS equivalent identifier is intended for human inspection, linking, debu
 
 The default Agent Card location is:
 
-```text
+~~~text
 https://{domain}/.well-known/agis/agents/{agent-name}.json
-```
+~~~
 
 A DNS Binding MAY specify a different Agent Card URL using the `card` parameter.  If the `card` parameter is present, verifiers MUST use that value for the binding under evaluation.
 
@@ -223,33 +227,33 @@ Agent Card URLs MUST use HTTPS.  Verifiers MUST reject non-HTTPS Agent Card URLs
 
 The default DNS TXT owner name for an agent is:
 
-```text
+~~~text
 _agis.{agent-name}.{domain}
-```
+~~~
 
 For the Agent Identifier:
 
-```text
+~~~text
 agent://example.com/support-agent
-```
+~~~
 
 the default DNS TXT owner name is:
 
-```text
+~~~text
 _agis.support-agent.example.com
-```
+~~~
 
 A minimal DNS TXT binding has the following form:
 
-```text
+~~~text
 agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.well-known/agis/agents/support-agent.json
-```
+~~~
 
 A recommended DNS TXT binding additionally includes a JWK thumbprint and Agent Card hash:
 
-```text
+~~~text
 agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.well-known/agis/agents/support-agent.json; jkt=dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08; card_sha256=842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
-```
+~~~
 
 The following parameters are defined:
 
@@ -276,7 +280,7 @@ The order of DNS Binding parameters is not significant.  Parameter names are cas
 
 An Agent Card is a JSON document describing an agent.  The v0.2.2 profile defines the following required members:
 
-```json
+~~~json
 {
   "agis_version": "0.2.2",
   "agent_id": "agent://example.com/support-agent",
@@ -318,7 +322,7 @@ An Agent Card is a JSON document describing an agent.  The v0.2.2 profile define
     "status_ttl_seconds": 60
   }
 }
-```
+~~~
 
 An Agent Card MAY contain additional members.  Verifiers MUST ignore unknown members unless local policy requires otherwise.  However, unknown members are included in the canonical hash unless explicitly excluded by this specification.
 
@@ -338,9 +342,9 @@ To compute the Agent Card hash, a verifier MUST:
 
 For the v0.2.2 test vector Agent Card, the expected SHA-256 digest is:
 
-```text
+~~~text
 842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
-```
+~~~
 
 A verifier MUST compare the computed Agent Card hash with the DNS Binding `card_sha256` parameter if that parameter is present.
 
@@ -352,19 +356,19 @@ The preferred v0.2.2 signing key type is Ed25519 represented as an OKP JWK.  Ed2
 
 A verifier MUST compute JWK thumbprints according to {{RFC7638}}.  For the v0.2.2 test vector public key:
 
-```json
+~~~json
 {
   "crv": "Ed25519",
   "kty": "OKP",
   "x": "ARcMgvwCLxMm4lHCAF5GfiC2N6D2w4tM7Mcrv-h81pg"
 }
-```
+~~~
 
 the expected JWK thumbprint is:
 
-```text
+~~~text
 dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
-```
+~~~
 
 A verifier MUST reject an Agent Card if a key's declared `jwk_thumbprint` does not match the computed thumbprint for the corresponding `public_key_jwk`.
 
@@ -372,15 +376,15 @@ A verifier SHOULD reject a DNS Binding if the `jkt` parameter is present and doe
 
 # Signed Agent Cards
 
-An Agent Card MAY include a top-level `signature` member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.3.0-alpha.2 reference implementation uses a compact JWS form with the following protected header:
+An Agent Card MAY include a top-level `signature` member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.3.0-alpha.3 reference implementation uses a compact JWS form with the following protected header:
 
-```json
+~~~json
 {
   "alg": "EdDSA",
   "kid": "key-2026-01",
   "typ": "agis-agent-card+jcs"
 }
-```
+~~~
 
 A verifier of a signed Agent Card MUST:
 
@@ -419,7 +423,7 @@ unknown:
 
 An example active status document is:
 
-```json
+~~~json
 {
   "agent_id": "agent://example.com/support-agent",
   "status": "active",
@@ -428,11 +432,11 @@ An example active status document is:
     "ttl_seconds": 60
   }
 }
-```
+~~~
 
 An example revoked status document is:
 
-```json
+~~~json
 {
   "agent_id": "agent://example.com/support-agent",
   "status": "revoked",
@@ -444,13 +448,32 @@ An example revoked status document is:
     "ttl_seconds": 30
   }
 }
-```
+~~~
 
 A verifier MUST reject a status document if the `agent_id` does not match the Agent Identifier under evaluation.
 
 A verifier MUST treat `revoked` and `compromised` as denial states.
 
 A revoked agent SHOULD remain resolvable for auditability, incident response, and historical verification.
+
+## Signed Status Documents
+
+A status document MAY include a top-level `signature` member.  When present, the signature covers the JCS-canonicalized status document with the `signature` field excluded.  The reference implementation uses EdDSA/JWS with the following structure:
+
+~~~json
+{
+  "type": "jws",
+  "alg": "EdDSA",
+  "key_id": "key-2026-01",
+  "value": "<compact-jws>"
+}
+~~~
+
+High-assurance deployments SHOULD require a valid status signature before trusting a status decision.  Live status fetching without signature verification is not sufficient for high-assurance revocation enforcement.
+
+A verifier that requires signed status SHOULD treat an unsigned or unverifiable status document as equivalent to an unknown status for purposes of the policy decision.  A verified signature on a revoked status document remains a denial.
+
+This feature is currently defined for offline deterministic use.  Production live-fetching behavior with signed status is not defined in this version of the profile.
 
 # Offline Identity Verification
 
@@ -498,27 +521,27 @@ AgIS request signatures use the signature label `agis`.
 
 A basic signed AgIS request MUST cover at least the following components:
 
-```text
+~~~text
 "agis-agent"
 "@method"
 "@target-uri"
 "content-digest"
 "date"
-```
+~~~
 
 The corresponding `Signature-Input` value has the following form:
 
-```text
+~~~text
 agis=("agis-agent" "@method" "@target-uri" "content-digest" "date");created=1782249000;keyid="key-2026-01";alg="ed25519"
-```
+~~~
 
 The request MUST include both `Signature-Input` and `Signature` fields as required by HTTP Message Signatures.
 
 The request body digest MUST be represented using `Content-Digest` as defined by {{RFC9530}}.  For the v0.2.2 request-body test vector, the expected value is:
 
-```text
+~~~text
 sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:
-```
+~~~
 
 A verifier MUST reject a request if the message body does not match the `Content-Digest` field.
 
@@ -530,20 +553,20 @@ A high-assurance AgIS request includes `AgIS-Nonce` and signs it.
 
 A high-assurance request MUST cover at least the following components:
 
-```text
+~~~text
 "agis-agent"
 "agis-nonce"
 "@method"
 "@target-uri"
 "content-digest"
 "date"
-```
+~~~
 
 Example:
 
-```text
+~~~text
 agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date");created=1782249000;keyid="key-2026-01";alg="ed25519"
-```
+~~~
 
 A verifier of high-assurance requests MUST enforce freshness.  The verifier SHOULD reject requests whose `Date` field falls outside a locally configured freshness window.  A default freshness window of 300 seconds is RECOMMENDED for deployments that do not have stronger time synchronization or policy requirements.
 
@@ -568,7 +591,7 @@ AgIS delegation tokens allow one agent to delegate a constrained capability to a
 
 A v0.2.2 delegation token is a compact signed token whose payload contains at least the following members:
 
-```json
+~~~json
 {
   "type": "agis-delegation",
   "version": "0.2.2",
@@ -587,17 +610,17 @@ A v0.2.2 delegation token is a compact signed token whose payload contains at le
   "expires_at": "2026-06-23T18:45:00Z",
   "jti": "delegation-2026-06-23-001"
 }
-```
+~~~
 
 The protected header for a v0.2.2 delegation token uses:
 
-```json
+~~~json
 {
   "alg": "EdDSA",
   "kid": "key-2026-01",
   "typ": "agis-delegation+jwt"
 }
-```
+~~~
 
 A verifier MUST reject a delegation token if:
 
@@ -626,14 +649,14 @@ A delegated signed request MUST sign the `AgIS-Delegation` field.
 
 The following signature components are REQUIRED for a single-delegation request:
 
-```text
+~~~text
 "agis-agent"
 "agis-delegation"
 "@method"
 "@target-uri"
 "content-digest"
 "date"
-```
+~~~
 
 A verifier MUST reject the request if the `AgIS-Agent` value does not match the delegation token subject.
 
@@ -671,14 +694,14 @@ A delegation chain signed request includes `AgIS-Delegation-Chain`.  The signatu
 
 The following signature components are REQUIRED for a delegation-chain request:
 
-```text
+~~~text
 "agis-agent"
 "agis-delegation-chain"
 "@method"
 "@target-uri"
 "content-digest"
 "date"
-```
+~~~
 
 A verifier MUST reject a delegation-chain signed request unless the HTTP message signature key is bound to the final subject of the delegation chain, as established by that final subject's verified Agent Card key set or equivalent verified identity evidence.  The final subject is the agent that acts on the delegated authority.
 
@@ -913,11 +936,7 @@ The implementation enforces that delegated request verification produces an allo
 
 The implementation is positioned as an ANS-compatible verification and governance layer.  It is not affiliated with or endorsed by Linux Foundation ANS.
 
-The implementation does not yet define:
-
-* production live DNS or HTTPS resolver behavior;
-* a signed status document format;
-* a production trust network or global trust root.
+The implementation does not yet define production live DNS or HTTPS resolver behavior, DNSSEC validation requirements, automatic binding of status signing keys to live resolver trust anchors, a production trust network, or a global trust root.
 
 # Acknowledgements
 
@@ -927,30 +946,30 @@ The author thanks the broader Internet standards community whose existing specif
 
 # Example Agent Identifier
 
-```text
+~~~text
 agent://example.com/support-agent
-```
+~~~
 
 # Example DNS TXT Binding
 
-```text
+~~~text
 agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.well-known/agis/agents/support-agent.json; jkt=dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08; card_sha256=842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
-```
+~~~
 
 # Example Agent Card Hash
 
-```text
+~~~text
 842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
-```
+~~~
 
 # Example JWK Thumbprint
 
-```text
+~~~text
 dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
-```
+~~~
 
 # Example Content-Digest
 
-```text
+~~~text
 sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:
-```
+~~~

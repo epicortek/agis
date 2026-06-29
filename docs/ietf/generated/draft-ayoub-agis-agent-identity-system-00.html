@@ -9,7 +9,8 @@
 <meta content="
        This document specifies AgIS, the Agent Identity System, a DNS-backed identity and verification profile for AI agents, autonomous software agents, and agentic services operating on the existing web. 
        AgIS defines an agent identifier form, DNS TXT bindings, Agent Cards, key thumbprints, status and revocation documents, signed HTTP request verification, replay protection, delegation tokens, and delegation chains.  The design intentionally reuses existing Internet mechanisms, including DNS, HTTPS well-known resources, JSON Web Keys, JSON canonicalization, HTTP Message Signatures, and HTTP digest fields. 
-       This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.2 reference implementation and its 19 deterministic test vectors.  That implementation enforces delegated signer-key binding by default, uses a two-phase replay protection API, and performs explicit EdDSA algorithm verification.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure. 
+       This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.3 reference implementation and its 23 deterministic test vectors.  That implementation includes signed Agent Cards, HTTP Message Signature verification, two-phase replay protection, delegation signer-key binding enforced by default, and signed agent status document support.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure. 
+       This is an individual Internet-Draft and a work in progress.  It has not been approved by the IETF, does not represent an IETF standard or RFC, and has not been adopted by any IETF working group. 
        AgIS is designed to be compatible with agent naming services such as Linux Foundation ANS and similar systems.  AgIS is not affiliated with, endorsed by, or a replacement for Linux Foundation ANS or any global naming authority.  AgIS defines verification, governance, and request-signing behavior that operates over identity evidence that may originate from ANS or any comparable naming layer. 
     " name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
@@ -26,14 +27,13 @@
     ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
-    Jinja2 3.1.6
-    lxml 6.0.2
+    Jinja2 3.1.2
+    lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.9.4
+    platformdirs 4.10.0
     pycountry 26.2.16
-    pypdf 5.9.0
     PyYAML 6.0.3
-    requests 2.33.1
+    requests 2.31.0
     wcwidth 0.8.1
 -->
 <link href="draft-ayoub-agis-agent-identity-system-00.xml" rel="alternate" type="application/rfc+xml">
@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ayoub</td>
-<td class="center">Expires 28 December 2026</td>
+<td class="center">Expires 31 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1242,12 +1242,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-ayoub-agis-agent-identity-system-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-26" class="published">26 June 2026</time>
+<time datetime="2026-06-29" class="published">29 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-28">28 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-31">31 December 2026</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1262,8 +1262,9 @@ li > p:last-of-type:only-child {
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document specifies AgIS, the Agent Identity System, a DNS-backed identity and verification profile for AI agents, autonomous software agents, and agentic services operating on the existing web.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">AgIS defines an agent identifier form, DNS TXT bindings, Agent Cards, key thumbprints, status and revocation documents, signed HTTP request verification, replay protection, delegation tokens, and delegation chains.  The design intentionally reuses existing Internet mechanisms, including DNS, HTTPS well-known resources, JSON Web Keys, JSON canonicalization, HTTP Message Signatures, and HTTP digest fields.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
-<p id="section-abstract-3">This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.2 reference implementation and its 19 deterministic test vectors.  That implementation enforces delegated signer-key binding by default, uses a two-phase replay protection API, and performs explicit EdDSA algorithm verification.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
-<p id="section-abstract-4">AgIS is designed to be compatible with agent naming services such as Linux Foundation ANS and similar systems.  AgIS is not affiliated with, endorsed by, or a replacement for Linux Foundation ANS or any global naming authority.  AgIS defines verification, governance, and request-signing behavior that operates over identity evidence that may originate from ANS or any comparable naming layer.<a href="#section-abstract-4" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">This document describes the AgIS 0.2.2 wire/profile format and the behavior exercised by the AgIS v0.3.0-alpha.3 reference implementation and its 23 deterministic test vectors.  That implementation includes signed Agent Cards, HTTP Message Signature verification, two-phase replay protection, delegation signer-key binding enforced by default, and signed agent status document support.  It does not define a global trust authority, a production trust network, or a new public-key infrastructure.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+<p id="section-abstract-4">This is an individual Internet-Draft and a work in progress.  It has not been approved by the IETF, does not represent an IETF standard or RFC, and has not been adopted by any IETF working group.<a href="#section-abstract-4" class="pilcrow">¶</a></p>
+<p id="section-abstract-5">AgIS is designed to be compatible with agent naming services such as Linux Foundation ANS and similar systems.  AgIS is not affiliated with, endorsed by, or a replacement for Linux Foundation ANS or any global naming authority.  AgIS defines verification, governance, and request-signing behavior that operates over identity evidence that may originate from ANS or any comparable naming layer.<a href="#section-abstract-5" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1284,7 +1285,7 @@ li > p:last-of-type:only-child {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 28 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 31 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1351,6 +1352,11 @@ li > p:last-of-type:only-child {
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
             <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-agent-status" class="internal xref">Agent Status</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-signed-status-documents" class="internal xref">Signed Status Documents</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
             <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-offline-identity-verificati" class="internal xref">Offline Identity Verification</a></p>
@@ -1433,38 +1439,39 @@ li > p:last-of-type:only-child {
             <p id="section-toc.1-1.27.1"><a href="#section-27" class="auto internal xref">27</a>. <a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.28">
-            <p id="section-toc.1-1.28.1"><a href="#section-28" class="auto internal xref">28</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.29">
-            <p id="section-toc.1-1.29.1"><a href="#section-29" class="auto internal xref">29</a>. <a href="#name-informative-references" class="internal xref">Informative References</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.30">
-            <p id="section-toc.1-1.30.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-examples" class="internal xref">Examples</a></p>
+            <p id="section-toc.1-1.28.1"><a href="#section-28" class="auto internal xref">28</a>. <a href="#name-references" class="internal xref">References</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.30.2.1">
-                <p id="section-toc.1-1.30.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-example-agent-identifier" class="internal xref">Example Agent Identifier</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.28.2.1">
+                <p id="section-toc.1-1.28.2.1.1"><a href="#section-28.1" class="auto internal xref">28.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.30.2.2">
-                <p id="section-toc.1-1.30.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-example-dns-txt-binding" class="internal xref">Example DNS TXT Binding</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.30.2.3">
-                <p id="section-toc.1-1.30.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-example-agent-card-hash" class="internal xref">Example Agent Card Hash</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.30.2.4">
-                <p id="section-toc.1-1.30.2.4.1"><a href="#appendix-A.4" class="auto internal xref">A.4</a>.  <a href="#name-example-jwk-thumbprint" class="internal xref">Example JWK Thumbprint</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.30.2.5">
-                <p id="section-toc.1-1.30.2.5.1"><a href="#appendix-A.5" class="auto internal xref">A.5</a>.  <a href="#name-example-content-digest" class="internal xref">Example Content-Digest</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.28.2.2">
+                <p id="section-toc.1-1.28.2.2.1"><a href="#section-28.2" class="auto internal xref">28.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.29">
+            <p id="section-toc.1-1.29.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-example-agent-identifier" class="internal xref">Example Agent Identifier</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.30">
+            <p id="section-toc.1-1.30.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-example-dns-txt-binding" class="internal xref">Example DNS TXT Binding</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.31">
-            <p id="section-toc.1-1.31.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.31.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-example-agent-card-hash" class="internal xref">Example Agent Card Hash</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.32">
+            <p id="section-toc.1-1.32.1"><a href="#appendix-D" class="auto internal xref">Appendix D</a>.  <a href="#name-example-jwk-thumbprint" class="internal xref">Example JWK Thumbprint</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.33">
+            <p id="section-toc.1-1.33.1"><a href="#appendix-E" class="auto internal xref">Appendix E</a>.  <a href="#name-example-content-digest" class="internal xref">Example Content-Digest</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.34">
+            <p id="section-toc.1-1.34.1"><a href="#appendix-F" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
 </section>
 </div>
+<div id="introduction">
 <section id="section-1">
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
@@ -1472,184 +1479,208 @@ li > p:last-of-type:only-child {
 <p id="section-1-1">Software agents are increasingly used to perform actions across organizational, application, and network boundaries.  These agents may call APIs, retrieve data, initiate workflows, delegate tasks, and act on behalf of organizations, users, or other agents.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">Existing web identity mechanisms are generally designed for human users, applications, domains, or service accounts.  They do not provide a compact, DNS-backed, agent-specific verification profile that allows a verifier to answer the following questions in a deterministic manner:<a href="#section-1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1-3.1">What agent is making this request?<a href="#section-1-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-1-3.1">
+          <p id="section-1-3.1.1">What agent is making this request?<a href="#section-1-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.2">Which domain is responsible for publishing that agent's identity information?<a href="#section-1-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.2">
+          <p id="section-1-3.2.1">Which domain is responsible for publishing that agent's identity information?<a href="#section-1-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.3">Which Agent Card describes the agent?<a href="#section-1-3.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.3">
+          <p id="section-1-3.3.1">Which Agent Card describes the agent?<a href="#section-1-3.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.4">Which public key is bound to that agent?<a href="#section-1-3.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.4">
+          <p id="section-1-3.4.1">Which public key is bound to that agent?<a href="#section-1-3.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.5">Has the Agent Card been tampered with?<a href="#section-1-3.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.5">
+          <p id="section-1-3.5.1">Has the Agent Card been tampered with?<a href="#section-1-3.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.6">Is the agent active, suspended, revoked, deprecated, or compromised?<a href="#section-1-3.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.6">
+          <p id="section-1-3.6.1">Is the agent active, suspended, revoked, deprecated, or compromised?<a href="#section-1-3.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.7">Was this HTTP request signed by the expected agent key?<a href="#section-1-3.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.7">
+          <p id="section-1-3.7.1">Was this HTTP request signed by the expected agent key?<a href="#section-1-3.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.8">Is the request fresh, or is it a replay?<a href="#section-1-3.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.8">
+          <p id="section-1-3.8.1">Is the request fresh, or is it a replay?<a href="#section-1-3.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.9">Is the acting agent using a valid delegation from another agent?<a href="#section-1-3.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.9">
+          <p id="section-1-3.9.1">Is the acting agent using a valid delegation from another agent?<a href="#section-1-3.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.10">Has a delegation chain attempted to escalate scope?<a href="#section-1-3.10" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-3.10">
+          <p id="section-1-3.10.1">Has a delegation chain attempted to escalate scope?<a href="#section-1-3.10.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-1-4">AgIS addresses these questions by defining a narrow identity and verification profile that can be deployed using ordinary DNS records and HTTPS resources.  It is intended to be small enough for developer tooling and deterministic enough for independent test-vector validation.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">AgIS is not an authorization framework by itself.  A verifier MAY use AgIS verification results as input to a local authorization policy, but final authorization decisions remain local to the relying party.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">AgIS is not a global naming service.  Agent naming, discovery, and identity evidence MAY be provided by external naming systems such as Linux Foundation ANS or similar agent name services.  AgIS defines the verification, governance, signed request, delegation, and replay protection behavior that operates over such identity evidence once it is available to a verifier.  AgIS is not affiliated with, endorsed by, or a replacement for any such naming authority.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">AgIS is also not a claim that an agent is safe, truthful, lawful, beneficial, or aligned.  It verifies identity bindings, key material, request signatures, freshness signals, revocation status, and delegation constraints.  It does not certify the behavior or intent of the agent.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-6">This document is an individual Internet-Draft submitted for community review.  It is a work in progress, has not been approved by the IETF, does not represent an IETF standard, and has not been adopted by any IETF working group.  The reference implementation is experimental alpha software.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">AgIS is not a global naming service.  Agent naming, discovery, and identity evidence MAY be provided by external naming systems such as Linux Foundation ANS or similar agent name services.  AgIS defines the verification, governance, signed request, delegation, and replay protection behavior that operates over such identity evidence once it is available to a verifier.  AgIS is not affiliated with, endorsed by, or a replacement for any such naming authority.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">AgIS is also not a claim that an agent is safe, truthful, lawful, beneficial, or aligned.  It verifies identity bindings, key material, request signatures, freshness signals, revocation status, and delegation constraints.  It does not certify the behavior or intent of the agent.<a href="#section-1-8" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="goals">
 <section id="section-2">
       <h2 id="name-goals">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-goals" class="section-name selfRef">Goals</a>
       </h2>
 <p id="section-2-1">AgIS has the following design goals:<a href="#section-2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-2-2">
-<li id="section-2-2.1">Reuse existing web infrastructure.<a href="#section-2-2.1" class="pilcrow">¶</a>
+<li id="section-2-2.1">
+          <p id="section-2-2.1.1">Reuse existing web infrastructure.<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.2">Make agent identity independently verifiable.<a href="#section-2-2.2" class="pilcrow">¶</a>
+        <li id="section-2-2.2">
+          <p id="section-2-2.2.1">Make agent identity independently verifiable.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.3">Bind an agent identifier to a domain-controlled publication point.<a href="#section-2-2.3" class="pilcrow">¶</a>
+        <li id="section-2-2.3">
+          <p id="section-2-2.3.1">Bind an agent identifier to a domain-controlled publication point.<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.4">Support deterministic offline verification.<a href="#section-2-2.4" class="pilcrow">¶</a>
+        <li id="section-2-2.4">
+          <p id="section-2-2.4.1">Support deterministic offline verification.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.5">Support signed HTTP requests using an existing HTTP signature framework.<a href="#section-2-2.5" class="pilcrow">¶</a>
+        <li id="section-2-2.5">
+          <p id="section-2-2.5.1">Support signed HTTP requests using an existing HTTP signature framework.<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.6">Support revocation and status checks.<a href="#section-2-2.6" class="pilcrow">¶</a>
+        <li id="section-2-2.6">
+          <p id="section-2-2.6.1">Support revocation and status checks.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.7">Support scoped delegation and delegation chains.<a href="#section-2-2.7" class="pilcrow">¶</a>
+        <li id="section-2-2.7">
+          <p id="section-2-2.7.1">Support scoped delegation and delegation chains.<a href="#section-2-2.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.8">Avoid requiring a global AgIS root authority.<a href="#section-2-2.8" class="pilcrow">¶</a>
+        <li id="section-2-2.8">
+          <p id="section-2-2.8.1">Avoid requiring a global AgIS root authority.<a href="#section-2-2.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.9">Avoid requiring blockchain, new DNS infrastructure, or new transport protocols.<a href="#section-2-2.9" class="pilcrow">¶</a>
+        <li id="section-2-2.9">
+          <p id="section-2-2.9.1">Avoid requiring blockchain, new DNS infrastructure, or new transport protocols.<a href="#section-2-2.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-2-2.10">Provide deterministic test vectors for independent implementations.<a href="#section-2-2.10" class="pilcrow">¶</a>
+        <li id="section-2-2.10">
+          <p id="section-2-2.10.1">Provide deterministic test vectors for independent implementations.<a href="#section-2-2.10.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 </section>
+</div>
+<div id="non-goals">
 <section id="section-3">
       <h2 id="name-non-goals">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-non-goals" class="section-name selfRef">Non-Goals</a>
       </h2>
 <p id="section-3-1">This version of AgIS does not define:<a href="#section-3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-2.1">a global trust registry;<a href="#section-3-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3-2.1">
+          <p id="section-3-2.1.1">a global trust registry;<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.2">a certificate authority;<a href="#section-3-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.2">
+          <p id="section-3-2.2.1">a certificate authority;<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.3">a legal identity framework;<a href="#section-3-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.3">
+          <p id="section-3-2.3.1">a legal identity framework;<a href="#section-3-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.4">a reputation system;<a href="#section-3-2.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.4">
+          <p id="section-3-2.4.1">a reputation system;<a href="#section-3-2.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.5">a payment system;<a href="#section-3-2.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.5">
+          <p id="section-3-2.5.1">a payment system;<a href="#section-3-2.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.6">a production authorization policy language;<a href="#section-3-2.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.6">
+          <p id="section-3-2.6.1">a production authorization policy language;<a href="#section-3-2.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.7">a live DNS and HTTPS resolver profile;<a href="#section-3-2.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.7">
+          <p id="section-3-2.7.1">a live DNS and HTTPS resolver profile;<a href="#section-3-2.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.8">a mandatory hosted verification service;<a href="#section-3-2.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.8">
+          <p id="section-3-2.8.1">a mandatory hosted verification service;<a href="#section-3-2.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.9">a registry for the <code>agent</code> URI scheme;<a href="#section-3-2.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.9">
+          <p id="section-3-2.9.1">a registry for the <code>agent</code> URI scheme;<a href="#section-3-2.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.10">an IANA registry for AgIS parameters.<a href="#section-3-2.10" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.10">
+          <p id="section-3-2.10.1">an IANA registry for AgIS parameters.<a href="#section-3-2.10.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-3-3">Future documents may define live resolver behavior, additional transport bindings, registries, discovery mechanisms, or production policy profiles.<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="terminology">
 <section id="section-4">
       <h2 id="name-terminology">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
       </h2>
-<p id="section-4-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they appear in all capitals.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlNewline" id="section-4-2">
-        <dt id="section-4-2.1">Agent</dt>
+<p id="section-4-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in BCP 14
+<span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they appear in all capitals.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-4-2">
+        <dt id="section-4-2.1">Agent:</dt>
         <dd style="margin-left: 1.5em" id="section-4-2.2">
           <p id="section-4-2.2.1">A software actor that can make requests, receive requests, or perform tasks using an identity described by this specification.<a href="#section-4-2.2.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-3">
-        <dt id="section-4-3.1">Agent Identifier</dt>
-        <dd style="margin-left: 1.5em" id="section-4-3.2">
-          <p id="section-4-3.2.1">A URI-like identifier beginning with <code>agent://</code> that names an agent under a domain.<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.3">Agent Identifier:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.4">
+          <p id="section-4-2.4.1">A URI-like identifier beginning with <code>agent://</code> that names an agent under a domain.<a href="#section-4-2.4.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-4">
-        <dt id="section-4-4.1">Agent Card</dt>
-        <dd style="margin-left: 1.5em" id="section-4-4.2">
-          <p id="section-4-4.2.1">A JSON document describing an agent, its identifier, owner metadata, capabilities, endpoints, public keys, cache information, and status.<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.5">Agent Card:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.6">
+          <p id="section-4-2.6.1">A JSON document describing an agent, its identifier, owner metadata, capabilities, endpoints, public keys, cache information, and status.<a href="#section-4-2.6.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-5">
-        <dt id="section-4-5.1">Agent Card Hash</dt>
-        <dd style="margin-left: 1.5em" id="section-4-5.2">
-          <p id="section-4-5.2.1">A SHA-256 digest of the JSON Canonicalization Scheme representation of the Agent Card, excluding the <code>signature</code> member.<a href="#section-4-5.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.7">Agent Card Hash:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.8">
+          <p id="section-4-2.8.1">A SHA-256 digest of the JSON Canonicalization Scheme representation of the Agent Card, excluding the <code>signature</code> member.<a href="#section-4-2.8.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-6">
-        <dt id="section-4-6.1">DNS Binding</dt>
-        <dd style="margin-left: 1.5em" id="section-4-6.2">
-          <p id="section-4-6.2.1">A DNS TXT record under the agent publisher's domain that binds an Agent Identifier to an Agent Card URL, and optionally to a JWK thumbprint and Agent Card hash.<a href="#section-4-6.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.9">DNS Binding:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.10">
+          <p id="section-4-2.10.1">A DNS TXT record under the agent publisher's domain that binds an Agent Identifier to an Agent Card URL, and optionally to a JWK thumbprint and Agent Card hash.<a href="#section-4-2.10.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-7">
-        <dt id="section-4-7.1">Verifier</dt>
-        <dd style="margin-left: 1.5em" id="section-4-7.2">
-          <p id="section-4-7.2.1">A party that evaluates AgIS identity material, request signatures, freshness, status, or delegation information.<a href="#section-4-7.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.11">Verifier:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.12">
+          <p id="section-4-2.12.1">A party that evaluates AgIS identity material, request signatures, freshness, status, or delegation information.<a href="#section-4-2.12.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-8">
-        <dt id="section-4-8.1">Issuer</dt>
-        <dd style="margin-left: 1.5em" id="section-4-8.2">
-          <p id="section-4-8.2.1">An agent that issues a delegation token.<a href="#section-4-8.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.13">Issuer:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.14">
+          <p id="section-4-2.14.1">An agent that issues a delegation token.<a href="#section-4-2.14.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-9">
-        <dt id="section-4-9.1">Subject</dt>
-        <dd style="margin-left: 1.5em" id="section-4-9.2">
-          <p id="section-4-9.2.1">An agent to which a delegation token is issued.<a href="#section-4-9.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.15">Subject:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.16">
+          <p id="section-4-2.16.1">An agent to which a delegation token is issued.<a href="#section-4-2.16.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-10">
-        <dt id="section-4-10.1">Acting Agent</dt>
-        <dd style="margin-left: 1.5em" id="section-4-10.2">
-          <p id="section-4-10.2.1">The agent identified by the <code>AgIS-Agent</code> HTTP field in a signed request.<a href="#section-4-10.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.17">Acting Agent:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.18">
+          <p id="section-4-2.18.1">The agent identified by the <code>AgIS-Agent</code> HTTP field in a signed request.<a href="#section-4-2.18.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-4-11">
-        <dt id="section-4-11.1">Delegation Chain</dt>
-        <dd style="margin-left: 1.5em" id="section-4-11.2">
-          <p id="section-4-11.2.1">An ordered list of delegation tokens in which each token delegates from one agent to the next.<a href="#section-4-11.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-4-2.19">Delegation Chain:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.20">
+          <p id="section-4-2.20.1">An ordered list of delegation tokens in which each token delegates from one agent to the next.<a href="#section-4-2.20.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
 </section>
+</div>
+<div id="agent-identifier">
 <section id="section-5">
       <h2 id="name-agent-identifier">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-agent-identifier" class="section-name selfRef">Agent Identifier</a>
       </h2>
 <p id="section-5-1">An AgIS Agent Identifier has the following form:<a href="#section-5-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5-2">
+<div class="lang-text sourcecode" id="section-5-2">
 <pre>
 agent://{domain}/{agent-name}
 </pre><a href="#section-5-2" class="pilcrow">¶</a>
 </div>
 <p id="section-5-3">For example:<a href="#section-5-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5-4">
+<div class="lang-text sourcecode" id="section-5-4">
 <pre>
 agent://example.com/support-agent
 </pre><a href="#section-5-4" class="pilcrow">¶</a>
 </div>
 <p id="section-5-5">The <code>domain</code> component identifies the DNS domain responsible for publishing the agent binding.  The <code>agent-name</code> component identifies the agent under that domain.<a href="#section-5-5" class="pilcrow">¶</a></p>
 <p id="section-5-6">The following ABNF defines the v0.2.2 Agent Identifier profile:<a href="#section-5-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-abnf art-text artwork" id="section-5-7">
+<div class="lang-abnf sourcecode" id="section-5-7">
 <pre>
 agent-id     = "agent://" domain "/" agent-name
 domain       = 1*(ALPHA / DIGIT / "-" / ".")
@@ -1660,24 +1691,28 @@ agent-name   = 1*(ALPHA / DIGIT / "-" / "_" / ".")
 <p id="section-5-9">An Agent Identifier MUST NOT contain a query component.  An Agent Identifier MUST NOT contain a fragment component.  An Agent Identifier MUST NOT contain userinfo.<a href="#section-5-9" class="pilcrow">¶</a></p>
 <p id="section-5-10">This document does not request registration of the <code>agent</code> URI scheme at this time.<a href="#section-5-10" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="https-equivalent-identifier">
 <section id="section-6">
       <h2 id="name-https-equivalent-identifier">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-https-equivalent-identifier" class="section-name selfRef">HTTPS Equivalent Identifier</a>
       </h2>
 <p id="section-6-1">An Agent Identifier maps to a default HTTPS publication location:<a href="#section-6-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6-2">
+<div class="lang-text sourcecode" id="section-6-2">
 <pre>
 https://{domain}/.well-known/agis/id/{agent-name}
 </pre><a href="#section-6-2" class="pilcrow">¶</a>
 </div>
 <p id="section-6-3">This HTTPS equivalent identifier is intended for human inspection, linking, debugging, and future resolver behavior.  The v0.2.2 profile does not require live fetching of this location for offline verification.<a href="#section-6-3" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="agent-card-location">
 <section id="section-7">
       <h2 id="name-agent-card-location">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-agent-card-location" class="section-name selfRef">Agent Card Location</a>
       </h2>
 <p id="section-7-1">The default Agent Card location is:<a href="#section-7-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7-2">
+<div class="lang-text sourcecode" id="section-7-2">
 <pre>
 https://{domain}/.well-known/agis/agents/{agent-name}.json
 </pre><a href="#section-7-2" class="pilcrow">¶</a>
@@ -1685,79 +1720,75 @@ https://{domain}/.well-known/agis/agents/{agent-name}.json
 <p id="section-7-3">A DNS Binding MAY specify a different Agent Card URL using the <code>card</code> parameter.  If the <code>card</code> parameter is present, verifiers MUST use that value for the binding under evaluation.<a href="#section-7-3" class="pilcrow">¶</a></p>
 <p id="section-7-4">Agent Card URLs MUST use HTTPS.  Verifiers MUST reject non-HTTPS Agent Card URLs except in explicitly configured local development environments.<a href="#section-7-4" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="dns-txt-binding">
 <section id="section-8">
       <h2 id="name-dns-txt-binding">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-dns-txt-binding" class="section-name selfRef">DNS TXT Binding</a>
       </h2>
 <p id="section-8-1">The default DNS TXT owner name for an agent is:<a href="#section-8-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8-2">
+<div class="lang-text sourcecode" id="section-8-2">
 <pre>
 _agis.{agent-name}.{domain}
 </pre><a href="#section-8-2" class="pilcrow">¶</a>
 </div>
 <p id="section-8-3">For the Agent Identifier:<a href="#section-8-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8-4">
+<div class="lang-text sourcecode" id="section-8-4">
 <pre>
 agent://example.com/support-agent
 </pre><a href="#section-8-4" class="pilcrow">¶</a>
 </div>
 <p id="section-8-5">the default DNS TXT owner name is:<a href="#section-8-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8-6">
+<div class="lang-text sourcecode" id="section-8-6">
 <pre>
 _agis.support-agent.example.com
 </pre><a href="#section-8-6" class="pilcrow">¶</a>
 </div>
 <p id="section-8-7">A minimal DNS TXT binding has the following form:<a href="#section-8-7" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8-8">
+<div class="lang-text sourcecode" id="section-8-8">
 <pre>
 agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.well-known/agis/agents/support-agent.json
 </pre><a href="#section-8-8" class="pilcrow">¶</a>
 </div>
 <p id="section-8-9">A recommended DNS TXT binding additionally includes a JWK thumbprint and Agent Card hash:<a href="#section-8-9" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8-10">
+<div class="lang-text sourcecode" id="section-8-10">
 <pre>
 agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.well-known/agis/agents/support-agent.json; jkt=dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08; card_sha256=842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
 </pre><a href="#section-8-10" class="pilcrow">¶</a>
 </div>
 <p id="section-8-11">The following parameters are defined:<a href="#section-8-11" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlNewline" id="section-8-12">
-        <dt id="section-8-12.1">agis</dt>
+<span class="break"></span><dl class="dlParallel" id="section-8-12">
+        <dt id="section-8-12.1">agis:</dt>
         <dd style="margin-left: 1.5em" id="section-8-12.2">
           <p id="section-8-12.2.1">The AgIS profile version.  For this document the value is <code>0.2.2</code>.<a href="#section-8-12.2.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-8-13">
-        <dt id="section-8-13.1">agent</dt>
-        <dd style="margin-left: 1.5em" id="section-8-13.2">
-          <p id="section-8-13.2.1">The Agent Identifier.<a href="#section-8-13.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-8-12.3">agent:</dt>
+        <dd style="margin-left: 1.5em" id="section-8-12.4">
+          <p id="section-8-12.4.1">The Agent Identifier.<a href="#section-8-12.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-8-12.5">card:</dt>
+        <dd style="margin-left: 1.5em" id="section-8-12.6">
+          <p id="section-8-12.6.1">The HTTPS URL of the Agent Card.<a href="#section-8-12.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-8-12.7">jkt:</dt>
+        <dd style="margin-left: 1.5em" id="section-8-12.8">
+          <p id="section-8-12.8.1">The JWK thumbprint of the signing key, encoded using base64url without padding.<a href="#section-8-12.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-8-12.9">card_sha256:</dt>
+        <dd style="margin-left: 1.5em" id="section-8-12.10">
+          <p id="section-8-12.10.1">The lowercase hexadecimal SHA-256 digest of the canonical Agent Card, excluding the <code>signature</code> member.<a href="#section-8-12.10.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<span class="break"></span><dl class="dlNewline" id="section-8-14">
-        <dt id="section-8-14.1">card</dt>
-        <dd style="margin-left: 1.5em" id="section-8-14.2">
-          <p id="section-8-14.2.1">The HTTPS URL of the Agent Card.<a href="#section-8-14.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-8-15">
-        <dt id="section-8-15.1">jkt</dt>
-        <dd style="margin-left: 1.5em" id="section-8-15.2">
-          <p id="section-8-15.2.1">The JWK thumbprint of the signing key, encoded using base64url without padding.<a href="#section-8-15.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-8-16">
-        <dt id="section-8-16.1">card_sha256</dt>
-        <dd style="margin-left: 1.5em" id="section-8-16.2">
-          <p id="section-8-16.2.1">The lowercase hexadecimal SHA-256 digest of the canonical Agent Card, excluding the <code>signature</code> member.<a href="#section-8-16.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<p id="section-8-17">A verifier MUST reject a DNS Binding if the <code>agis</code>, <code>agent</code>, or <code>card</code> parameter is missing.  A verifier SHOULD reject a DNS Binding if <code>jkt</code> or <code>card_sha256</code> is present but does not match the Agent Card under evaluation.<a href="#section-8-17" class="pilcrow">¶</a></p>
-<p id="section-8-18">The order of DNS Binding parameters is not significant.  Parameter names are case-sensitive.  Parameter values MUST NOT be interpreted as shell expressions, templates, or executable content.<a href="#section-8-18" class="pilcrow">¶</a></p>
+<p id="section-8-13">A verifier MUST reject a DNS Binding if the <code>agis</code>, <code>agent</code>, or <code>card</code> parameter is missing.  A verifier SHOULD reject a DNS Binding if <code>jkt</code> or <code>card_sha256</code> is present but does not match the Agent Card under evaluation.<a href="#section-8-13" class="pilcrow">¶</a></p>
+<p id="section-8-14">The order of DNS Binding parameters is not significant.  Parameter names are case-sensitive.  Parameter values MUST NOT be interpreted as shell expressions, templates, or executable content.<a href="#section-8-14" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="agent-card">
 <section id="section-9">
       <h2 id="name-agent-card">
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-agent-card" class="section-name selfRef">Agent Card</a>
@@ -1811,6 +1842,8 @@ agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.w
 <p id="section-9-3">An Agent Card MAY contain additional members.  Verifiers MUST ignore unknown members unless local policy requires otherwise.  However, unknown members are included in the canonical hash unless explicitly excluded by this specification.<a href="#section-9-3" class="pilcrow">¶</a></p>
 <p id="section-9-4">The <code>signature</code> member, if present, MUST be excluded from Agent Card canonicalization and hashing.<a href="#section-9-4" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="agent-card-canonicalization-and-hashing">
 <section id="section-10">
       <h2 id="name-agent-card-canonicalization">
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-agent-card-canonicalization" class="section-name selfRef">Agent Card Canonicalization and Hashing</a>
@@ -1818,25 +1851,32 @@ agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.w
 <p id="section-10-1">Agent Card canonicalization uses the JSON Canonicalization Scheme defined by <span>[<a href="#RFC8785" class="cite xref">RFC8785</a>]</span>.<a href="#section-10-1" class="pilcrow">¶</a></p>
 <p id="section-10-2">To compute the Agent Card hash, a verifier MUST:<a href="#section-10-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-10-3">
-<li id="section-10-3.1">Parse the Agent Card as JSON.<a href="#section-10-3.1" class="pilcrow">¶</a>
+<li id="section-10-3.1">
+          <p id="section-10-3.1.1">Parse the Agent Card as JSON.<a href="#section-10-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-10-3.2">Remove the top-level <code>signature</code> member if it is present.<a href="#section-10-3.2" class="pilcrow">¶</a>
+        <li id="section-10-3.2">
+          <p id="section-10-3.2.1">Remove the top-level <code>signature</code> member if it is present.<a href="#section-10-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-10-3.3">Canonicalize the resulting JSON object using JCS.<a href="#section-10-3.3" class="pilcrow">¶</a>
+        <li id="section-10-3.3">
+          <p id="section-10-3.3.1">Canonicalize the resulting JSON object using JCS.<a href="#section-10-3.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-10-3.4">Compute SHA-256 over the UTF-8 bytes of the canonicalized JSON.<a href="#section-10-3.4" class="pilcrow">¶</a>
+        <li id="section-10-3.4">
+          <p id="section-10-3.4.1">Compute SHA-256 over the UTF-8 bytes of the canonicalized JSON.<a href="#section-10-3.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-10-3.5">Represent the digest as lowercase hexadecimal.<a href="#section-10-3.5" class="pilcrow">¶</a>
+        <li id="section-10-3.5">
+          <p id="section-10-3.5.1">Represent the digest as lowercase hexadecimal.<a href="#section-10-3.5.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 <p id="section-10-4">For the v0.2.2 test vector Agent Card, the expected SHA-256 digest is:<a href="#section-10-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-10-5">
+<div class="lang-text sourcecode" id="section-10-5">
 <pre>
 842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
 </pre><a href="#section-10-5" class="pilcrow">¶</a>
 </div>
 <p id="section-10-6">A verifier MUST compare the computed Agent Card hash with the DNS Binding <code>card_sha256</code> parameter if that parameter is present.<a href="#section-10-6" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="agent-keys-and-jwk-thumbprints">
 <section id="section-11">
       <h2 id="name-agent-keys-and-jwk-thumbpri">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-agent-keys-and-jwk-thumbpri" class="section-name selfRef">Agent Keys and JWK Thumbprints</a>
@@ -1854,7 +1894,7 @@ agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.w
 </pre><a href="#section-11-4" class="pilcrow">¶</a>
 </div>
 <p id="section-11-5">the expected JWK thumbprint is:<a href="#section-11-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-11-6">
+<div class="lang-text sourcecode" id="section-11-6">
 <pre>
 dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
 </pre><a href="#section-11-6" class="pilcrow">¶</a>
@@ -1862,11 +1902,13 @@ dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
 <p id="section-11-7">A verifier MUST reject an Agent Card if a key's declared <code>jwk_thumbprint</code> does not match the computed thumbprint for the corresponding <code>public_key_jwk</code>.<a href="#section-11-7" class="pilcrow">¶</a></p>
 <p id="section-11-8">A verifier SHOULD reject a DNS Binding if the <code>jkt</code> parameter is present and does not match at least one active signing key in the Agent Card.<a href="#section-11-8" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="signed-agent-cards">
 <section id="section-12">
       <h2 id="name-signed-agent-cards">
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-signed-agent-cards" class="section-name selfRef">Signed Agent Cards</a>
       </h2>
-<p id="section-12-1">An Agent Card MAY include a top-level <code>signature</code> member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.3.0-alpha.2 reference implementation uses a compact JWS form with the following protected header:<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-1">An Agent Card MAY include a top-level <code>signature</code> member containing a detached or embedded signature over the canonical Agent Card representation.  The v0.3.0-alpha.3 reference implementation uses a compact JWS form with the following protected header:<a href="#section-12-1" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-12-2">
 <pre>
 {
@@ -1878,71 +1920,69 @@ dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
 </div>
 <p id="section-12-3">A verifier of a signed Agent Card MUST:<a href="#section-12-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-12-4">
-<li id="section-12-4.1">Remove the top-level <code>signature</code> member.<a href="#section-12-4.1" class="pilcrow">¶</a>
+<li id="section-12-4.1">
+          <p id="section-12-4.1.1">Remove the top-level <code>signature</code> member.<a href="#section-12-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-12-4.2">Canonicalize the remaining Agent Card using JCS.<a href="#section-12-4.2" class="pilcrow">¶</a>
+        <li id="section-12-4.2">
+          <p id="section-12-4.2.1">Canonicalize the remaining Agent Card using JCS.<a href="#section-12-4.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-12-4.3">Verify that the signed payload equals the canonical representation.<a href="#section-12-4.3" class="pilcrow">¶</a>
+        <li id="section-12-4.3">
+          <p id="section-12-4.3.1">Verify that the signed payload equals the canonical representation.<a href="#section-12-4.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-12-4.4">Locate the signing key by <code>kid</code>.<a href="#section-12-4.4" class="pilcrow">¶</a>
+        <li id="section-12-4.4">
+          <p id="section-12-4.4.1">Locate the signing key by <code>kid</code>.<a href="#section-12-4.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-12-4.5">Verify the signature using the key's public JWK.<a href="#section-12-4.5" class="pilcrow">¶</a>
+        <li id="section-12-4.5">
+          <p id="section-12-4.5.1">Verify the signature using the key's public JWK.<a href="#section-12-4.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-12-4.6">Verify that the Agent Card hash remains stable after excluding the <code>signature</code> member.<a href="#section-12-4.6" class="pilcrow">¶</a>
+        <li id="section-12-4.6">
+          <p id="section-12-4.6.1">Verify that the Agent Card hash remains stable after excluding the <code>signature</code> member.<a href="#section-12-4.6.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 <p id="section-12-5">A verifier MUST reject a signed Agent Card if the signed payload does not match the canonical Agent Card representation.<a href="#section-12-5" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="agent-status">
 <section id="section-13">
       <h2 id="name-agent-status">
 <a href="#section-13" class="section-number selfRef">13. </a><a href="#name-agent-status" class="section-name selfRef">Agent Status</a>
       </h2>
 <p id="section-13-1">An Agent Status document describes the current status of an agent.  The default status endpoint is listed in the Agent Card under <code>endpoints.status</code>.<a href="#section-13-1" class="pilcrow">¶</a></p>
 <p id="section-13-2">The following status values are defined:<a href="#section-13-2" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlNewline" id="section-13-3">
-        <dt id="section-13-3.1">active</dt>
+<span class="break"></span><dl class="dlParallel" id="section-13-3">
+        <dt id="section-13-3.1">active:</dt>
         <dd style="margin-left: 1.5em" id="section-13-3.2">
           <p id="section-13-3.2.1">The agent is active.<a href="#section-13-3.2.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-13-4">
-        <dt id="section-13-4.1">revoked</dt>
-        <dd style="margin-left: 1.5em" id="section-13-4.2">
-          <p id="section-13-4.2.1">The agent has been revoked and MUST NOT be allowed to act.<a href="#section-13-4.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-13-3.3">revoked:</dt>
+        <dd style="margin-left: 1.5em" id="section-13-3.4">
+          <p id="section-13-3.4.1">The agent has been revoked and MUST NOT be allowed to act.<a href="#section-13-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-13-3.5">suspended:</dt>
+        <dd style="margin-left: 1.5em" id="section-13-3.6">
+          <p id="section-13-3.6.1">The agent is temporarily suspended and SHOULD NOT be allowed to act unless local policy explicitly permits it.<a href="#section-13-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-13-3.7">deprecated:</dt>
+        <dd style="margin-left: 1.5em" id="section-13-3.8">
+          <p id="section-13-3.8.1">The agent remains resolvable for compatibility or audit purposes, but new integrations SHOULD NOT depend on it.<a href="#section-13-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-13-3.9">compromised:</dt>
+        <dd style="margin-left: 1.5em" id="section-13-3.10">
+          <p id="section-13-3.10.1">The agent or its key material is believed to be compromised and MUST NOT be allowed to act.<a href="#section-13-3.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-13-3.11">unknown:</dt>
+        <dd style="margin-left: 1.5em" id="section-13-3.12">
+          <p id="section-13-3.12.1">The publisher cannot currently assert a stronger status.  Verifiers SHOULD treat this status conservatively.<a href="#section-13-3.12.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<span class="break"></span><dl class="dlNewline" id="section-13-5">
-        <dt id="section-13-5.1">suspended</dt>
-        <dd style="margin-left: 1.5em" id="section-13-5.2">
-          <p id="section-13-5.2.1">The agent is temporarily suspended and SHOULD NOT be allowed to act unless local policy explicitly permits it.<a href="#section-13-5.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-13-6">
-        <dt id="section-13-6.1">deprecated</dt>
-        <dd style="margin-left: 1.5em" id="section-13-6.2">
-          <p id="section-13-6.2.1">The agent remains resolvable for compatibility or audit purposes, but new integrations SHOULD NOT depend on it.<a href="#section-13-6.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-13-7">
-        <dt id="section-13-7.1">compromised</dt>
-        <dd style="margin-left: 1.5em" id="section-13-7.2">
-          <p id="section-13-7.2.1">The agent or its key material is believed to be compromised and MUST NOT be allowed to act.<a href="#section-13-7.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-13-8">
-        <dt id="section-13-8.1">unknown</dt>
-        <dd style="margin-left: 1.5em" id="section-13-8.2">
-          <p id="section-13-8.2.1">The publisher cannot currently assert a stronger status.  Verifiers SHOULD treat this status conservatively.<a href="#section-13-8.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<p id="section-13-9">An example active status document is:<a href="#section-13-9" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-13-10">
+<p id="section-13-4">An example active status document is:<a href="#section-13-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-13-5">
 <pre>
 {
   "agent_id": "agent://example.com/support-agent",
@@ -1952,10 +1992,10 @@ dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
     "ttl_seconds": 60
   }
 }
-</pre><a href="#section-13-10" class="pilcrow">¶</a>
+</pre><a href="#section-13-5" class="pilcrow">¶</a>
 </div>
-<p id="section-13-11">An example revoked status document is:<a href="#section-13-11" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-13-12">
+<p id="section-13-6">An example revoked status document is:<a href="#section-13-6" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-13-7">
 <pre>
 {
   "agent_id": "agent://example.com/support-agent",
@@ -1968,120 +2008,155 @@ dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
     "ttl_seconds": 30
   }
 }
-</pre><a href="#section-13-12" class="pilcrow">¶</a>
+</pre><a href="#section-13-7" class="pilcrow">¶</a>
 </div>
-<p id="section-13-13">A verifier MUST reject a status document if the <code>agent_id</code> does not match the Agent Identifier under evaluation.<a href="#section-13-13" class="pilcrow">¶</a></p>
-<p id="section-13-14">A verifier MUST treat <code>revoked</code> and <code>compromised</code> as denial states.<a href="#section-13-14" class="pilcrow">¶</a></p>
-<p id="section-13-15">A revoked agent SHOULD remain resolvable for auditability, incident response, and historical verification.<a href="#section-13-15" class="pilcrow">¶</a></p>
+<p id="section-13-8">A verifier MUST reject a status document if the <code>agent_id</code> does not match the Agent Identifier under evaluation.<a href="#section-13-8" class="pilcrow">¶</a></p>
+<p id="section-13-9">A verifier MUST treat <code>revoked</code> and <code>compromised</code> as denial states.<a href="#section-13-9" class="pilcrow">¶</a></p>
+<p id="section-13-10">A revoked agent SHOULD remain resolvable for auditability, incident response, and historical verification.<a href="#section-13-10" class="pilcrow">¶</a></p>
+<div id="signed-status-documents">
+<section id="section-13.1">
+        <h3 id="name-signed-status-documents">
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-signed-status-documents" class="section-name selfRef">Signed Status Documents</a>
+        </h3>
+<p id="section-13.1-1">A status document MAY include a top-level <code>signature</code> member.  When present, the signature covers the JCS-canonicalized status document with the <code>signature</code> field excluded.  The reference implementation uses EdDSA/JWS with the following structure:<a href="#section-13.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-13.1-2">
+<pre>
+{
+  "type": "jws",
+  "alg": "EdDSA",
+  "key_id": "key-2026-01",
+  "value": "&lt;compact-jws&gt;"
+}
+</pre><a href="#section-13.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-13.1-3">High-assurance deployments SHOULD require a valid status signature before trusting a status decision.  Live status fetching without signature verification is not sufficient for high-assurance revocation enforcement.<a href="#section-13.1-3" class="pilcrow">¶</a></p>
+<p id="section-13.1-4">A verifier that requires signed status SHOULD treat an unsigned or unverifiable status document as equivalent to an unknown status for purposes of the policy decision.  A verified signature on a revoked status document remains a denial.<a href="#section-13.1-4" class="pilcrow">¶</a></p>
+<p id="section-13.1-5">This feature is currently defined for offline deterministic use.  Production live-fetching behavior with signed status is not defined in this version of the profile.<a href="#section-13.1-5" class="pilcrow">¶</a></p>
 </section>
+</div>
+</section>
+</div>
+<div id="offline-identity-verification">
 <section id="section-14">
       <h2 id="name-offline-identity-verificati">
 <a href="#section-14" class="section-number selfRef">14. </a><a href="#name-offline-identity-verificati" class="section-name selfRef">Offline Identity Verification</a>
       </h2>
 <p id="section-14-1">The v0.2.2 offline identity verification procedure takes as input:<a href="#section-14-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-14-2.1">an Agent Identifier;<a href="#section-14-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-14-2.1">
+          <p id="section-14-2.1.1">an Agent Identifier;<a href="#section-14-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-14-2.2">a DNS Binding;<a href="#section-14-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-14-2.2">
+          <p id="section-14-2.2.1">a DNS Binding;<a href="#section-14-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-14-2.3">an Agent Card;<a href="#section-14-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-14-2.3">
+          <p id="section-14-2.3.1">an Agent Card;<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-14-2.4">optionally, an Agent Status document.<a href="#section-14-2.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-14-2.4">
+          <p id="section-14-2.4.1">optionally, an Agent Status document.<a href="#section-14-2.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-14-3">A verifier performs the following checks:<a href="#section-14-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-14-4">
-<li id="section-14-4.1">The DNS Binding is syntactically valid.<a href="#section-14-4.1" class="pilcrow">¶</a>
+<li id="section-14-4.1">
+          <p id="section-14-4.1.1">The DNS Binding is syntactically valid.<a href="#section-14-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.2">The DNS Binding <code>agent</code> value matches the Agent Identifier.<a href="#section-14-4.2" class="pilcrow">¶</a>
+        <li id="section-14-4.2">
+          <p id="section-14-4.2.1">The DNS Binding <code>agent</code> value matches the Agent Identifier.<a href="#section-14-4.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.3">The DNS Binding <code>card</code> value identifies the Agent Card URL under evaluation.<a href="#section-14-4.3" class="pilcrow">¶</a>
+        <li id="section-14-4.3">
+          <p id="section-14-4.3.1">The DNS Binding <code>card</code> value identifies the Agent Card URL under evaluation.<a href="#section-14-4.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.4">The Agent Card <code>agent_id</code> matches the Agent Identifier.<a href="#section-14-4.4" class="pilcrow">¶</a>
+        <li id="section-14-4.4">
+          <p id="section-14-4.4.1">The Agent Card <code>agent_id</code> matches the Agent Identifier.<a href="#section-14-4.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.5">The Agent Card canonical hash matches <code>card_sha256</code>, if present.<a href="#section-14-4.5" class="pilcrow">¶</a>
+        <li id="section-14-4.5">
+          <p id="section-14-4.5.1">The Agent Card canonical hash matches <code>card_sha256</code>, if present.<a href="#section-14-4.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.6">At least one active Agent Card signing key matches <code>jkt</code>, if present.<a href="#section-14-4.6" class="pilcrow">¶</a>
+        <li id="section-14-4.6">
+          <p id="section-14-4.6.1">At least one active Agent Card signing key matches <code>jkt</code>, if present.<a href="#section-14-4.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.7">Each declared JWK thumbprint matches its public JWK.<a href="#section-14-4.7" class="pilcrow">¶</a>
+        <li id="section-14-4.7">
+          <p id="section-14-4.7.1">Each declared JWK thumbprint matches its public JWK.<a href="#section-14-4.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.8">The Agent Card signature is valid, if present.<a href="#section-14-4.8" class="pilcrow">¶</a>
+        <li id="section-14-4.8">
+          <p id="section-14-4.8.1">The Agent Card signature is valid, if present.<a href="#section-14-4.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.9">The status document is valid, if present.<a href="#section-14-4.9" class="pilcrow">¶</a>
+        <li id="section-14-4.9">
+          <p id="section-14-4.9.1">The status document is valid, if present.<a href="#section-14-4.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-14-4.10">Revocation or compromise status is enforced.<a href="#section-14-4.10" class="pilcrow">¶</a>
+        <li id="section-14-4.10">
+          <p id="section-14-4.10.1">Revocation or compromise status is enforced.<a href="#section-14-4.10.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 <p id="section-14-5">A verifier MUST NOT allow a revoked or compromised agent merely because its cryptographic signature is valid.<a href="#section-14-5" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="http-request-signing-profile">
 <section id="section-15">
       <h2 id="name-http-request-signing-profil">
 <a href="#section-15" class="section-number selfRef">15. </a><a href="#name-http-request-signing-profil" class="section-name selfRef">HTTP Request Signing Profile</a>
       </h2>
 <p id="section-15-1">AgIS signed requests use HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span>.<a href="#section-15-1" class="pilcrow">¶</a></p>
 <p id="section-15-2">The following HTTP fields are defined by this profile:<a href="#section-15-2" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlNewline" id="section-15-3">
-        <dt id="section-15-3.1">AgIS-Agent</dt>
+<span class="break"></span><dl class="dlParallel" id="section-15-3">
+        <dt id="section-15-3.1">AgIS-Agent:</dt>
         <dd style="margin-left: 1.5em" id="section-15-3.2">
           <p id="section-15-3.2.1">The Agent Identifier of the acting agent.<a href="#section-15-3.2.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-15-4">
-        <dt id="section-15-4.1">AgIS-Nonce</dt>
-        <dd style="margin-left: 1.5em" id="section-15-4.2">
-          <p id="section-15-4.2.1">A nonce used for replay protection in high-assurance requests.<a href="#section-15-4.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-15-3.3">AgIS-Nonce:</dt>
+        <dd style="margin-left: 1.5em" id="section-15-3.4">
+          <p id="section-15-3.4.1">A nonce used for replay protection in high-assurance requests.<a href="#section-15-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-15-3.5">AgIS-Delegation:</dt>
+        <dd style="margin-left: 1.5em" id="section-15-3.6">
+          <p id="section-15-3.6.1">A single compact delegation token.<a href="#section-15-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-15-3.7">AgIS-Delegation-Chain:</dt>
+        <dd style="margin-left: 1.5em" id="section-15-3.8">
+          <p id="section-15-3.8.1">A comma-separated ordered list of delegation tokens.<a href="#section-15-3.8.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<span class="break"></span><dl class="dlNewline" id="section-15-5">
-        <dt id="section-15-5.1">AgIS-Delegation</dt>
-        <dd style="margin-left: 1.5em" id="section-15-5.2">
-          <p id="section-15-5.2.1">A single compact delegation token.<a href="#section-15-5.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-15-6">
-        <dt id="section-15-6.1">AgIS-Delegation-Chain</dt>
-        <dd style="margin-left: 1.5em" id="section-15-6.2">
-          <p id="section-15-6.2.1">A comma-separated ordered list of delegation tokens.<a href="#section-15-6.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<p id="section-15-7">AgIS request signatures use the signature label <code>agis</code>.<a href="#section-15-7" class="pilcrow">¶</a></p>
-<p id="section-15-8">A basic signed AgIS request MUST cover at least the following components:<a href="#section-15-8" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-15-9">
+<p id="section-15-4">AgIS request signatures use the signature label <code>agis</code>.<a href="#section-15-4" class="pilcrow">¶</a></p>
+<p id="section-15-5">A basic signed AgIS request MUST cover at least the following components:<a href="#section-15-5" class="pilcrow">¶</a></p>
+<div class="lang-text sourcecode" id="section-15-6">
 <pre>
 "agis-agent"
 "@method"
 "@target-uri"
 "content-digest"
 "date"
-</pre><a href="#section-15-9" class="pilcrow">¶</a>
+</pre><a href="#section-15-6" class="pilcrow">¶</a>
 </div>
-<p id="section-15-10">The corresponding <code>Signature-Input</code> value has the following form:<a href="#section-15-10" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-15-11">
+<p id="section-15-7">The corresponding <code>Signature-Input</code> value has the following form:<a href="#section-15-7" class="pilcrow">¶</a></p>
+<div class="lang-text sourcecode" id="section-15-8">
 <pre>
 agis=("agis-agent" "@method" "@target-uri" "content-digest" "date");created=1782249000;keyid="key-2026-01";alg="ed25519"
-</pre><a href="#section-15-11" class="pilcrow">¶</a>
+</pre><a href="#section-15-8" class="pilcrow">¶</a>
 </div>
-<p id="section-15-12">The request MUST include both <code>Signature-Input</code> and <code>Signature</code> fields as required by HTTP Message Signatures.<a href="#section-15-12" class="pilcrow">¶</a></p>
-<p id="section-15-13">The request body digest MUST be represented using <code>Content-Digest</code> as defined by <span>[<a href="#RFC9530" class="cite xref">RFC9530</a>]</span>.  For the v0.2.2 request-body test vector, the expected value is:<a href="#section-15-13" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-15-14">
+<p id="section-15-9">The request MUST include both <code>Signature-Input</code> and <code>Signature</code> fields as required by HTTP Message Signatures.<a href="#section-15-9" class="pilcrow">¶</a></p>
+<p id="section-15-10">The request body digest MUST be represented using <code>Content-Digest</code> as defined by <span>[<a href="#RFC9530" class="cite xref">RFC9530</a>]</span>.  For the v0.2.2 request-body test vector, the expected value is:<a href="#section-15-10" class="pilcrow">¶</a></p>
+<div class="lang-text sourcecode" id="section-15-11">
 <pre>
 sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:
-</pre><a href="#section-15-14" class="pilcrow">¶</a>
+</pre><a href="#section-15-11" class="pilcrow">¶</a>
 </div>
-<p id="section-15-15">A verifier MUST reject a request if the message body does not match the <code>Content-Digest</code> field.<a href="#section-15-15" class="pilcrow">¶</a></p>
-<p id="section-15-16">A verifier MUST reject a request if any covered signature component has been changed after signing.<a href="#section-15-16" class="pilcrow">¶</a></p>
+<p id="section-15-12">A verifier MUST reject a request if the message body does not match the <code>Content-Digest</code> field.<a href="#section-15-12" class="pilcrow">¶</a></p>
+<p id="section-15-13">A verifier MUST reject a request if any covered signature component has been changed after signing.<a href="#section-15-13" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="high-assurance-requests-freshness-and-replay-protection">
 <section id="section-16">
       <h2 id="name-high-assurance-requests-fre">
 <a href="#section-16" class="section-number selfRef">16. </a><a href="#name-high-assurance-requests-fre" class="section-name selfRef">High-Assurance Requests, Freshness, and Replay Protection</a>
       </h2>
 <p id="section-16-1">A high-assurance AgIS request includes <code>AgIS-Nonce</code> and signs it.<a href="#section-16-1" class="pilcrow">¶</a></p>
 <p id="section-16-2">A high-assurance request MUST cover at least the following components:<a href="#section-16-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-16-3">
+<div class="lang-text sourcecode" id="section-16-3">
 <pre>
 "agis-agent"
 "agis-nonce"
@@ -2092,7 +2167,7 @@ sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:
 </pre><a href="#section-16-3" class="pilcrow">¶</a>
 </div>
 <p id="section-16-4">Example:<a href="#section-16-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-16-5">
+<div class="lang-text sourcecode" id="section-16-5">
 <pre>
 agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date");created=1782249000;keyid="key-2026-01";alg="ed25519"
 </pre><a href="#section-16-5" class="pilcrow">¶</a>
@@ -2100,23 +2175,31 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-16-6">A verifier of high-assurance requests MUST enforce freshness.  The verifier SHOULD reject requests whose <code>Date</code> field falls outside a locally configured freshness window.  A default freshness window of 300 seconds is RECOMMENDED for deployments that do not have stronger time synchronization or policy requirements.<a href="#section-16-6" class="pilcrow">¶</a></p>
 <p id="section-16-7">A verifier of high-assurance requests MUST enforce replay protection.  The tuple used for replay detection SHOULD include:<a href="#section-16-7" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-16-8.1">the Agent Identifier;<a href="#section-16-8.1" class="pilcrow">¶</a>
+<li class="normal" id="section-16-8.1">
+          <p id="section-16-8.1.1">the Agent Identifier;<a href="#section-16-8.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-16-8.2">the nonce;<a href="#section-16-8.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-16-8.2">
+          <p id="section-16-8.2.1">the nonce;<a href="#section-16-8.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-16-8.3">the HTTP method;<a href="#section-16-8.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-16-8.3">
+          <p id="section-16-8.3.1">the HTTP method;<a href="#section-16-8.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-16-8.4">the target URI;<a href="#section-16-8.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-16-8.4">
+          <p id="section-16-8.4.1">the target URI;<a href="#section-16-8.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-16-8.5">the signature key identifier;<a href="#section-16-8.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-16-8.5">
+          <p id="section-16-8.5.1">the signature key identifier;<a href="#section-16-8.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-16-8.6">a freshness-window identifier or expiration time.<a href="#section-16-8.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-16-8.6">
+          <p id="section-16-8.6.1">a freshness-window identifier or expiration time.<a href="#section-16-8.6.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-16-9">A verifier MUST reject a high-assurance request if the nonce is missing.<a href="#section-16-9" class="pilcrow">¶</a></p>
-<p id="section-16-10">A verifier MUST reject a high-assurance request if the nonce has already been observed within the replay-protection window.  Nonces SHOULD be retained for at least the configured freshness window plus an allowance for clock skew.<a href="#section-16-10" class="pilcrow">¶</a></p>
-<p id="section-16-11">A verifier MUST NOT commit a nonce to the replay-protection cache until all cryptographic checks --- including the HTTP message signature --- have passed.  Committing a nonce before signature verification would allow an attacker to deny service by burning valid nonces using forged or malformed requests.  The two-phase approach --- checking replay state before cryptographic verification, but committing only after all checks succeed --- is REQUIRED for high-assurance replay protection.<a href="#section-16-11" class="pilcrow">¶</a></p>
+<p id="section-16-10">A verifier MUST reject a high-assurance request if the nonce has already been observed within the replay-protection window.<a href="#section-16-10" class="pilcrow">¶</a></p>
+<p id="section-16-11">A verifier MUST NOT commit a nonce to the replay-protection cache until all cryptographic checks — including the HTTP message signature — have passed.  Committing a nonce before signature verification would allow an attacker to deny service by burning valid nonces using forged or malformed requests.  The two-phase approach — checking replay state before cryptographic verification, but committing only after all checks succeed — is REQUIRED for high-assurance replay protection.<a href="#section-16-11" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="delegation-tokens">
 <section id="section-17">
       <h2 id="name-delegation-tokens">
 <a href="#section-17" class="section-number selfRef">17. </a><a href="#name-delegation-tokens" class="section-name selfRef">Delegation Tokens</a>
@@ -2157,25 +2240,35 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 </div>
 <p id="section-17-6">A verifier MUST reject a delegation token if:<a href="#section-17-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-17-7.1">the signature is invalid;<a href="#section-17-7.1" class="pilcrow">¶</a>
+<li class="normal" id="section-17-7.1">
+          <p id="section-17-7.1.1">the signature is invalid;<a href="#section-17-7.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-17-7.2">the token is expired;<a href="#section-17-7.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-17-7.2">
+          <p id="section-17-7.2.1">the token is expired;<a href="#section-17-7.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-17-7.3">the token is not yet valid;<a href="#section-17-7.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-17-7.3">
+          <p id="section-17-7.3.1">the token is not yet valid;<a href="#section-17-7.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-17-7.4">the <code>audience</code> does not match the expected relying party;<a href="#section-17-7.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-17-7.4">
+          <p id="section-17-7.4.1">the <code>audience</code> does not match the expected relying party;<a href="#section-17-7.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-17-7.5">the required scope is not included in the delegated scope;<a href="#section-17-7.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-17-7.5">
+          <p id="section-17-7.5.1">the required scope is not included in the delegated scope;<a href="#section-17-7.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-17-7.6">the acting agent does not match the token subject;<a href="#section-17-7.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-17-7.6">
+          <p id="section-17-7.6.1">the acting agent does not match the token subject;<a href="#section-17-7.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-17-7.7">the <code>jti</code> member is missing;<a href="#section-17-7.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-17-7.7">
+          <p id="section-17-7.7.1">the <code>jti</code> member is missing;<a href="#section-17-7.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-17-7.8">local policy rejects any declared constraint.<a href="#section-17-7.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-17-7.8">
+          <p id="section-17-7.8.1">local policy rejects any declared constraint.<a href="#section-17-7.8.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-17-8">A delegation token MUST NOT be interpreted as an unrestricted bearer credential.  It is a signed, scoped, time-bounded statement whose validity depends on signature verification, subject matching, audience matching, scope checking, time validation, and local policy.<a href="#section-17-8" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="delegated-signed-requests">
 <section id="section-18">
       <h2 id="name-delegated-signed-requests">
 <a href="#section-18" class="section-number selfRef">18. </a><a href="#name-delegated-signed-requests" class="section-name selfRef">Delegated Signed Requests</a>
@@ -2183,24 +2276,24 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-18-1">A delegated signed request includes:<a href="#section-18-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-18-2.1">
-          <code>AgIS-Agent</code>, identifying the acting agent;<a href="#section-18-2.1" class="pilcrow">¶</a>
+          <p id="section-18-2.1.1"><code>AgIS-Agent</code>, identifying the acting agent;<a href="#section-18-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-18-2.2">
-          <code>AgIS-Delegation</code>, carrying the delegation token;<a href="#section-18-2.2" class="pilcrow">¶</a>
+          <p id="section-18-2.2.1"><code>AgIS-Delegation</code>, carrying the delegation token;<a href="#section-18-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-18-2.3">
-          <code>Content-Digest</code>;<a href="#section-18-2.3" class="pilcrow">¶</a>
+          <p id="section-18-2.3.1"><code>Content-Digest</code>;<a href="#section-18-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-18-2.4">
-          <code>Signature-Input</code>;<a href="#section-18-2.4" class="pilcrow">¶</a>
+          <p id="section-18-2.4.1"><code>Signature-Input</code>;<a href="#section-18-2.4.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-18-2.5">
-          <code>Signature</code>.<a href="#section-18-2.5" class="pilcrow">¶</a>
+          <p id="section-18-2.5.1"><code>Signature</code>.<a href="#section-18-2.5.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-18-3">A delegated signed request MUST sign the <code>AgIS-Delegation</code> field.<a href="#section-18-3" class="pilcrow">¶</a></p>
 <p id="section-18-4">The following signature components are REQUIRED for a single-delegation request:<a href="#section-18-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-18-5">
+<div class="lang-text sourcecode" id="section-18-5">
 <pre>
 "agis-agent"
 "agis-delegation"
@@ -2215,13 +2308,17 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-18-8">A verifier MUST reject a delegated signed request unless the HTTP message signature key is bound to the delegation subject, as established by that subject's verified Agent Card key set or equivalent verified identity evidence.<a href="#section-18-8" class="pilcrow">¶</a></p>
 <p id="section-18-9">A verifier MUST NOT accept a delegated signed request merely because both of the following are true:<a href="#section-18-9" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-18-10.1">the delegation token is cryptographically valid, and<a href="#section-18-10.1" class="pilcrow">¶</a>
+<li class="normal" id="section-18-10.1">
+          <p id="section-18-10.1.1">the delegation token is cryptographically valid, and<a href="#section-18-10.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-18-10.2">the HTTP request signature is cryptographically valid under some caller-supplied key.<a href="#section-18-10.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-18-10.2">
+          <p id="section-18-10.2.1">the HTTP request signature is cryptographically valid under some caller-supplied key.<a href="#section-18-10.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-18-11">The HTTP message signer key and the delegation subject MUST be verifiably bound to the same identity.  A valid delegation token and a valid request signature that were checked independently, without confirming that both refer to the same acting agent's key material, do not together constitute a valid delegated request.<a href="#section-18-11" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="delegation-chains">
 <section id="section-19">
       <h2 id="name-delegation-chains">
 <a href="#section-19" class="section-number selfRef">19. </a><a href="#name-delegation-chains" class="section-name selfRef">Delegation Chains</a>
@@ -2229,31 +2326,41 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-19-1">A delegation chain is an ordered sequence of delegation tokens.  Each token delegates from one agent to the next.<a href="#section-19-1" class="pilcrow">¶</a></p>
 <p id="section-19-2">For a valid chain:<a href="#section-19-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-19-3.1">the first token's issuer is the root issuer;<a href="#section-19-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-19-3.1">
+          <p id="section-19-3.1.1">the first token's issuer is the root issuer;<a href="#section-19-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.2">the first token's subject is the second token's issuer;<a href="#section-19-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.2">
+          <p id="section-19-3.2.1">the first token's subject is the second token's issuer;<a href="#section-19-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.3">each subsequent token's subject is the next token's issuer;<a href="#section-19-3.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.3">
+          <p id="section-19-3.3.1">each subsequent token's subject is the next token's issuer;<a href="#section-19-3.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.4">the final token's subject is the acting agent;<a href="#section-19-3.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.4">
+          <p id="section-19-3.4.1">the final token's subject is the acting agent;<a href="#section-19-3.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.5">the acting agent matches <code>AgIS-Agent</code>;<a href="#section-19-3.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.5">
+          <p id="section-19-3.5.1">the acting agent matches <code>AgIS-Agent</code>;<a href="#section-19-3.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.6">the audience is valid for each token;<a href="#section-19-3.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.6">
+          <p id="section-19-3.6.1">the audience is valid for each token;<a href="#section-19-3.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.7">the required scope is included in the effective scope;<a href="#section-19-3.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.7">
+          <p id="section-19-3.7.1">the required scope is included in the effective scope;<a href="#section-19-3.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.8">each token is within its validity interval;<a href="#section-19-3.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.8">
+          <p id="section-19-3.8.1">each token is within its validity interval;<a href="#section-19-3.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.9">each token has a valid signature;<a href="#section-19-3.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.9">
+          <p id="section-19-3.9.1">each token has a valid signature;<a href="#section-19-3.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-3.10">each token contains a <code>jti</code>.<a href="#section-19-3.10" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-3.10">
+          <p id="section-19-3.10.1">each token contains a <code>jti</code>.<a href="#section-19-3.10.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-19-4">The effective scope of a delegation chain MUST NOT exceed the scope granted upstream.  Implementations SHOULD compute effective scope as the intersection of scopes across the chain unless local policy defines a stricter rule.<a href="#section-19-4" class="pilcrow">¶</a></p>
 <p id="section-19-5">A delegation chain signed request includes <code>AgIS-Delegation-Chain</code>.  The signature MUST cover that field.<a href="#section-19-5" class="pilcrow">¶</a></p>
 <p id="section-19-6">The following signature components are REQUIRED for a delegation-chain request:<a href="#section-19-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-19-7">
+<div class="lang-text sourcecode" id="section-19-7">
 <pre>
 "agis-agent"
 "agis-delegation-chain"
@@ -2267,74 +2374,76 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-19-9">A verifier MUST NOT accept a chained delegated request merely because the delegation chain verifies and the HTTP request signature is cryptographically valid under some caller-supplied key.  Both the chain and the request signer MUST be traceable to the same final subject's verified key material.<a href="#section-19-9" class="pilcrow">¶</a></p>
 <p id="section-19-10">A verifier MUST reject a delegation chain if:<a href="#section-19-10" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-19-11.1">the chain order is reversed;<a href="#section-19-11.1" class="pilcrow">¶</a>
+<li class="normal" id="section-19-11.1">
+          <p id="section-19-11.1.1">the chain order is reversed;<a href="#section-19-11.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-11.2">any link is broken;<a href="#section-19-11.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.2">
+          <p id="section-19-11.2.1">any link is broken;<a href="#section-19-11.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-11.3">a downstream token attempts scope escalation;<a href="#section-19-11.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.3">
+          <p id="section-19-11.3.1">a downstream token attempts scope escalation;<a href="#section-19-11.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-11.4">the acting agent does not match the final subject;<a href="#section-19-11.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.4">
+          <p id="section-19-11.4.1">the acting agent does not match the final subject;<a href="#section-19-11.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-11.5">the required scope is not in the effective scope;<a href="#section-19-11.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.5">
+          <p id="section-19-11.5.1">the required scope is not in the effective scope;<a href="#section-19-11.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-11.6">any token is expired;<a href="#section-19-11.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.6">
+          <p id="section-19-11.6.1">any token is expired;<a href="#section-19-11.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-11.7">the chain field is modified after signing;<a href="#section-19-11.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.7">
+          <p id="section-19-11.7.1">the chain field is modified after signing;<a href="#section-19-11.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-19-11.8">the HTTP message signature key is not bound to the final subject's verified key set.<a href="#section-19-11.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-11.8">
+          <p id="section-19-11.8.1">the HTTP message signature key is not bound to the final subject's verified key set.<a href="#section-19-11.8.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
+</div>
+<div id="trust-levels">
 <section id="section-20">
       <h2 id="name-trust-levels">
 <a href="#section-20" class="section-number selfRef">20. </a><a href="#name-trust-levels" class="section-name selfRef">Trust Levels</a>
       </h2>
 <p id="section-20-1">AgIS defines the following non-normative trust levels for reporting verification strength:<a href="#section-20-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlNewline" id="section-20-2">
-        <dt id="section-20-2.1">Level 0</dt>
+<span class="break"></span><dl class="dlParallel" id="section-20-2">
+        <dt id="section-20-2.1">Level 0:</dt>
         <dd style="margin-left: 1.5em" id="section-20-2.2">
           <p id="section-20-2.2.1">No usable AgIS identity evidence is available.<a href="#section-20-2.2.1" class="pilcrow">¶</a></p>
 </dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-20-3">
-        <dt id="section-20-3.1">Level 1</dt>
-        <dd style="margin-left: 1.5em" id="section-20-3.2">
-          <p id="section-20-3.2.1">The Agent Identifier and Agent Card are syntactically valid.<a href="#section-20-3.2.1" class="pilcrow">¶</a></p>
+        <dd class="break"></dd>
+<dt id="section-20-2.3">Level 1:</dt>
+        <dd style="margin-left: 1.5em" id="section-20-2.4">
+          <p id="section-20-2.4.1">The Agent Identifier and Agent Card are syntactically valid.<a href="#section-20-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-20-2.5">Level 2:</dt>
+        <dd style="margin-left: 1.5em" id="section-20-2.6">
+          <p id="section-20-2.6.1">A DNS Binding exists and links the Agent Identifier to an Agent Card URL.<a href="#section-20-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-20-2.7">Level 3:</dt>
+        <dd style="margin-left: 1.5em" id="section-20-2.8">
+          <p id="section-20-2.8.1">The Agent Card hash and JWK thumbprint are consistent with the DNS Binding and Agent Card.<a href="#section-20-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-20-2.9">Level 4:</dt>
+        <dd style="margin-left: 1.5em" id="section-20-2.10">
+          <p id="section-20-2.10.1">The Agent Card signature and status checks are valid, and the agent is active.<a href="#section-20-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-20-2.11">Level 5:</dt>
+        <dd style="margin-left: 1.5em" id="section-20-2.12">
+          <p id="section-20-2.12.1">A signed request is valid with freshness and replay protection enforced, and local policy accepts the result.<a href="#section-20-2.12.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<span class="break"></span><dl class="dlNewline" id="section-20-4">
-        <dt id="section-20-4.1">Level 2</dt>
-        <dd style="margin-left: 1.5em" id="section-20-4.2">
-          <p id="section-20-4.2.1">A DNS Binding exists and links the Agent Identifier to an Agent Card URL.<a href="#section-20-4.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-20-5">
-        <dt id="section-20-5.1">Level 3</dt>
-        <dd style="margin-left: 1.5em" id="section-20-5.2">
-          <p id="section-20-5.2.1">The Agent Card hash and JWK thumbprint are consistent with the DNS Binding and Agent Card.<a href="#section-20-5.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-20-6">
-        <dt id="section-20-6.1">Level 4</dt>
-        <dd style="margin-left: 1.5em" id="section-20-6.2">
-          <p id="section-20-6.2.1">The Agent Card signature and status checks are valid, and the agent is active.<a href="#section-20-6.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<span class="break"></span><dl class="dlNewline" id="section-20-7">
-        <dt id="section-20-7.1">Level 5</dt>
-        <dd style="margin-left: 1.5em" id="section-20-7.2">
-          <p id="section-20-7.2.1">A signed request is valid with freshness and replay protection enforced, and local policy accepts the result.<a href="#section-20-7.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<p id="section-20-8">The v0.2.2 offline reference identity verification test vectors reach Level 4.  High-assurance signed request verification can reach Level 5 when freshness and replay protection are enforced by the verifier.<a href="#section-20-8" class="pilcrow">¶</a></p>
-<p id="section-20-9">Trust levels are advisory.  Implementations MUST NOT treat a trust level as a replacement for local authorization policy.<a href="#section-20-9" class="pilcrow">¶</a></p>
+<p id="section-20-3">The v0.2.2 offline reference identity verification test vectors reach Level 4.  High-assurance signed request verification can reach Level 5 when freshness and replay protection are enforced by the verifier.<a href="#section-20-3" class="pilcrow">¶</a></p>
+<p id="section-20-4">Trust levels are advisory.  Implementations MUST NOT treat a trust level as a replacement for local authorization policy.<a href="#section-20-4" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="error-model">
 <section id="section-21">
       <h2 id="name-error-model">
 <a href="#section-21" class="section-number selfRef">21. </a><a href="#name-error-model" class="section-name selfRef">Error Model</a>
@@ -2342,105 +2451,163 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-21-1">AgIS implementations SHOULD expose deterministic error codes suitable for test-vector validation and debugging.<a href="#section-21-1" class="pilcrow">¶</a></p>
 <p id="section-21-2">The following error categories are RECOMMENDED:<a href="#section-21-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-21-3.1">DNS binding errors;<a href="#section-21-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-21-3.1">
+          <p id="section-21-3.1.1">DNS binding errors;<a href="#section-21-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.2">Agent Card hash errors;<a href="#section-21-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.2">
+          <p id="section-21-3.2.1">Agent Card hash errors;<a href="#section-21-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.3">JWK thumbprint errors;<a href="#section-21-3.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.3">
+          <p id="section-21-3.3.1">JWK thumbprint errors;<a href="#section-21-3.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.4">Agent Card signature errors;<a href="#section-21-3.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.4">
+          <p id="section-21-3.4.1">Agent Card signature errors;<a href="#section-21-3.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.5">status and revocation errors;<a href="#section-21-3.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.5">
+          <p id="section-21-3.5.1">status and revocation errors;<a href="#section-21-3.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.6">Content-Digest errors;<a href="#section-21-3.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.6">
+          <p id="section-21-3.6.1">Content-Digest errors;<a href="#section-21-3.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.7">HTTP signature errors;<a href="#section-21-3.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.7">
+          <p id="section-21-3.7.1">HTTP signature errors;<a href="#section-21-3.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.8">freshness errors;<a href="#section-21-3.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.8">
+          <p id="section-21-3.8.1">freshness errors;<a href="#section-21-3.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.9">replay-detection errors;<a href="#section-21-3.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.9">
+          <p id="section-21-3.9.1">replay-detection errors;<a href="#section-21-3.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.10">delegation token errors;<a href="#section-21-3.10" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.10">
+          <p id="section-21-3.10.1">delegation token errors;<a href="#section-21-3.10.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.11">delegation chain errors;<a href="#section-21-3.11" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.11">
+          <p id="section-21-3.11.1">delegation chain errors;<a href="#section-21-3.11.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-21-3.12">local policy denial.<a href="#section-21-3.12" class="pilcrow">¶</a>
+        <li class="normal" id="section-21-3.12">
+          <p id="section-21-3.12.1">local policy denial.<a href="#section-21-3.12.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-21-4">Error messages SHOULD be safe to log.  Error messages MUST NOT include private keys, secret tokens, bearer credentials, or unredacted sensitive request bodies.<a href="#section-21-4" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="deterministic-test-vectors">
 <section id="section-22">
       <h2 id="name-deterministic-test-vectors">
 <a href="#section-22" class="section-number selfRef">22. </a><a href="#name-deterministic-test-vectors" class="section-name selfRef">Deterministic Test Vectors</a>
       </h2>
-<p id="section-22-1">The v0.3.0-alpha.2 reference implementation includes 19 deterministic test vectors for:<a href="#section-22-1" class="pilcrow">¶</a></p>
+<p id="section-22-1">The v0.3.0-alpha.3 reference implementation includes 23 deterministic test vectors for:<a href="#section-22-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-22-2.1">Agent Card canonical hash (TV001);<a href="#section-22-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-22-2.1">
+          <p id="section-22-2.1.1">Agent Card canonical hash (TV001);<a href="#section-22-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.2">JWK thumbprint (TV002);<a href="#section-22-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.2">
+          <p id="section-22-2.2.1">JWK thumbprint (TV002);<a href="#section-22-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.3">DNS TXT Binding (TV003);<a href="#section-22-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.3">
+          <p id="section-22-2.3.1">DNS TXT Binding (TV003);<a href="#section-22-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.4">signed Agent Card (TV004);<a href="#section-22-2.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.4">
+          <p id="section-22-2.4.1">signed Agent Card (TV004);<a href="#section-22-2.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.5">Agent Card tampering --- negative (TV004-tamper);<a href="#section-22-2.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.5">
+          <p id="section-22-2.5.1">Agent Card tampering — negative (TV004-tamper);<a href="#section-22-2.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.6">Agent Status and revocation (TV005);<a href="#section-22-2.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.6">
+          <p id="section-22-2.6.1">Agent Status and revocation (TV005);<a href="#section-22-2.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.7">invalid status documents --- negative (TV005-negative);<a href="#section-22-2.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.7">
+          <p id="section-22-2.7.1">invalid status documents — negative (TV005-negative);<a href="#section-22-2.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.8">offline composite identity verification (TV006);<a href="#section-22-2.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.8">
+          <p id="section-22-2.8.1">offline composite identity verification (TV006);<a href="#section-22-2.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.9">invalid composite verification cases --- negative (TV006-negative);<a href="#section-22-2.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.9">
+          <p id="section-22-2.9.1">invalid composite verification cases — negative (TV006-negative);<a href="#section-22-2.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.10">Content-Digest (TV007);<a href="#section-22-2.10" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.10">
+          <p id="section-22-2.10.1">Content-Digest (TV007);<a href="#section-22-2.10.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.11">invalid Content-Digest cases --- negative (TV007-negative);<a href="#section-22-2.11" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.11">
+          <p id="section-22-2.11.1">invalid Content-Digest cases — negative (TV007-negative);<a href="#section-22-2.11.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.12">HTTP Message Signatures (TV008);<a href="#section-22-2.12" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.12">
+          <p id="section-22-2.12.1">HTTP Message Signatures (TV008);<a href="#section-22-2.12.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.13">invalid HTTP signature cases --- negative (TV008-negative);<a href="#section-22-2.13" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.13">
+          <p id="section-22-2.13.1">invalid HTTP signature cases — negative (TV008-negative);<a href="#section-22-2.13.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.14">offline signed request verification (TV009);<a href="#section-22-2.14" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.14">
+          <p id="section-22-2.14.1">offline signed request verification (TV009);<a href="#section-22-2.14.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.15">invalid signed request cases --- negative (TV009-negative);<a href="#section-22-2.15" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.15">
+          <p id="section-22-2.15.1">invalid signed request cases — negative (TV009-negative);<a href="#section-22-2.15.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.16">freshness and replay protection (TV010);<a href="#section-22-2.16" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.16">
+          <p id="section-22-2.16.1">freshness and replay protection (TV010);<a href="#section-22-2.16.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.17">invalid freshness and replay cases --- negative (TV010-negative);<a href="#section-22-2.17" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.17">
+          <p id="section-22-2.17.1">invalid freshness and replay cases — negative (TV010-negative);<a href="#section-22-2.17.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.18">single delegation token (TV011);<a href="#section-22-2.18" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.18">
+          <p id="section-22-2.18.1">single delegation token (TV011);<a href="#section-22-2.18.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.19">invalid delegation token cases --- negative (TV011-negative);<a href="#section-22-2.19" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.19">
+          <p id="section-22-2.19.1">invalid delegation token cases — negative (TV011-negative);<a href="#section-22-2.19.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.20">delegated signed request with signer-key binding (TV012);<a href="#section-22-2.20" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.20">
+          <p id="section-22-2.20.1">delegated signed request with signer-key binding (TV012);<a href="#section-22-2.20.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.21">invalid delegated request cases --- negative (TV012-negative);<a href="#section-22-2.21" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.21">
+          <p id="section-22-2.21.1">invalid delegated request cases — negative (TV012-negative);<a href="#section-22-2.21.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.22">delegation chain signed request with final-subject key binding (TV013);<a href="#section-22-2.22" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.22">
+          <p id="section-22-2.22.1">delegation chain signed request with final-subject key binding (TV013);<a href="#section-22-2.22.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.23">invalid delegation chain request cases --- negative (TV013-negative);<a href="#section-22-2.23" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.23">
+          <p id="section-22-2.23.1">invalid delegation chain request cases — negative (TV013-negative);<a href="#section-22-2.23.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.24">status decision policy across all six status values (TV014);<a href="#section-22-2.24" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.24">
+          <p id="section-22-2.24.1">status decision policy across all six status values (TV014);<a href="#section-22-2.24.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.25">delegated request with attacker key --- negative (TV015-negative);<a href="#section-22-2.25" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.25">
+          <p id="section-22-2.25.1">delegated request with attacker key — negative (TV015-negative);<a href="#section-22-2.25.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.26">chain delegated request with attacker key --- negative (TV016-negative);<a href="#section-22-2.26" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.26">
+          <p id="section-22-2.26.1">chain delegated request with attacker key — negative (TV016-negative);<a href="#section-22-2.26.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.27">replay nonce not committed on invalid signature --- negative (TV017-negative);<a href="#section-22-2.27" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.27">
+          <p id="section-22-2.27.1">replay nonce not committed on invalid signature — negative (TV017-negative);<a href="#section-22-2.27.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.28">deprecated unbound signer key, deny by default --- negative (TV018-negative);<a href="#section-22-2.28" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.28">
+          <p id="section-22-2.28.1">deprecated unbound signer key, deny by default — negative (TV018-negative);<a href="#section-22-2.28.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-22-2.29">deprecated unbound signer key, explicit opt-in allows with warning (TV019).<a href="#section-22-2.29" class="pilcrow">¶</a>
+        <li class="normal" id="section-22-2.29">
+          <p id="section-22-2.29.1">deprecated unbound signer key, explicit opt-in allows with warning (TV019);<a href="#section-22-2.29.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-22-2.30">
+          <p id="section-22-2.30.1">signed active status document: valid signature, decision allow (TV020);<a href="#section-22-2.30.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-22-2.31">
+          <p id="section-22-2.31.1">tampered signed status document: signature fails, decision deny (TV021-negative);<a href="#section-22-2.31.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-22-2.32">
+          <p id="section-22-2.32.1">signed revoked status document: valid signature, decision deny — status policy (TV022-negative);<a href="#section-22-2.32.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-22-2.33">
+          <p id="section-22-2.33.1">unsigned status document with required signature: decision deny (TV023-negative).<a href="#section-22-2.33.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-22-3">Independent implementations SHOULD validate against the deterministic test vectors before claiming compatibility with this profile.<a href="#section-22-3" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="security-considerations">
 <section id="section-23">
       <h2 id="name-security-considerations">
 <a href="#section-23" class="section-number selfRef">23. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 <p id="section-23-1">AgIS is a security-sensitive identity and request-verification profile.  Implementations and deployments need to consider at least the following threats.<a href="#section-23-1" class="pilcrow">¶</a></p>
+<div id="dns-control-and-domain-compromise">
 <section id="section-23.1">
         <h3 id="name-dns-control-and-domain-comp">
 <a href="#section-23.1" class="section-number selfRef">23.1. </a><a href="#name-dns-control-and-domain-comp" class="section-name selfRef">DNS Control and Domain Compromise</a>
@@ -2448,6 +2615,8 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-23.1-1">AgIS binds agent identity to DNS names.  If an attacker controls the DNS zone, registrar account, authoritative DNS provider account, or DNS publication pipeline, the attacker can publish malicious Agent Bindings.<a href="#section-23.1-1" class="pilcrow">¶</a></p>
 <p id="section-23.1-2">Deployments SHOULD protect registrar and DNS provider accounts with strong authentication and operational controls.  DNSSEC MAY be used where available, but this document does not require DNSSEC.<a href="#section-23.1-2" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="https-publication-security">
 <section id="section-23.2">
         <h3 id="name-https-publication-security">
 <a href="#section-23.2" class="section-number selfRef">23.2. </a><a href="#name-https-publication-security" class="section-name selfRef">HTTPS Publication Security</a>
@@ -2455,6 +2624,8 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-23.2-1">Agent Cards and status documents are expected to be published over HTTPS.  If HTTPS publication infrastructure is compromised, an attacker may publish altered Agent Cards or status documents.<a href="#section-23.2-1" class="pilcrow">¶</a></p>
 <p id="section-23.2-2">Verifiers SHOULD prefer DNS Binding values that include <code>card_sha256</code> and <code>jkt</code>, because these allow detection of Agent Card or key substitution when the DNS Binding remains trustworthy.<a href="#section-23.2-2" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="canonicalization-attacks">
 <section id="section-23.3">
         <h3 id="name-canonicalization-attacks">
 <a href="#section-23.3" class="section-number selfRef">23.3. </a><a href="#name-canonicalization-attacks" class="section-name selfRef">Canonicalization Attacks</a>
@@ -2462,6 +2633,8 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-23.3-1">Incorrect JSON canonicalization can cause implementations to compute different hashes or verify different payloads.  Implementations MUST use JCS as specified by this document and MUST exclude only the top-level <code>signature</code> member from Agent Card hashing.<a href="#section-23.3-1" class="pilcrow">¶</a></p>
 <p id="section-23.3-2">Implementations MUST NOT canonicalize by using ordinary pretty-printing, unstable object key ordering, locale-sensitive ordering, or runtime-specific serialization behavior.<a href="#section-23.3-2" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="key-compromise">
 <section id="section-23.4">
         <h3 id="name-key-compromise">
 <a href="#section-23.4" class="section-number selfRef">23.4. </a><a href="#name-key-compromise" class="section-name selfRef">Key Compromise</a>
@@ -2469,68 +2642,91 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-23.4-1">If an agent signing key is compromised, an attacker may produce valid signatures until the key is revoked or removed from the Agent Card and status information is updated.<a href="#section-23.4-1" class="pilcrow">¶</a></p>
 <p id="section-23.4-2">Publishers SHOULD provide short status TTLs for higher-risk agents.  Verifiers SHOULD respect revocation and compromised states even when signatures remain cryptographically valid.<a href="#section-23.4-2" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="revocation-caching">
 <section id="section-23.5">
         <h3 id="name-revocation-caching">
 <a href="#section-23.5" class="section-number selfRef">23.5. </a><a href="#name-revocation-caching" class="section-name selfRef">Revocation Caching</a>
         </h3>
 <p id="section-23.5-1">Caching improves availability but can delay enforcement of revocation.  Publishers SHOULD use conservative status TTLs.  Verifiers SHOULD bound cache lifetime and MAY re-check status for high-risk operations.<a href="#section-23.5-1" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="replay-attacks">
 <section id="section-23.6">
         <h3 id="name-replay-attacks">
 <a href="#section-23.6" class="section-number selfRef">23.6. </a><a href="#name-replay-attacks" class="section-name selfRef">Replay Attacks</a>
         </h3>
 <p id="section-23.6-1">Signed requests without freshness and replay protection can be captured and replayed.  High-assurance deployments MUST require freshness checking and nonce-based replay protection.<a href="#section-23.6-1" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="clock-skew">
 <section id="section-23.7">
         <h3 id="name-clock-skew">
 <a href="#section-23.7" class="section-number selfRef">23.7. </a><a href="#name-clock-skew" class="section-name selfRef">Clock Skew</a>
         </h3>
 <p id="section-23.7-1">Freshness checks depend on clocks.  Verifiers SHOULD define an acceptable clock-skew window.  Deployments SHOULD maintain reliable time synchronization.<a href="#section-23.7-1" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="signature-confusion">
 <section id="section-23.8">
         <h3 id="name-signature-confusion">
 <a href="#section-23.8" class="section-number selfRef">23.8. </a><a href="#name-signature-confusion" class="section-name selfRef">Signature Confusion</a>
         </h3>
 <p id="section-23.8-1">Implementations MUST verify the expected signature label and covered components.  A signature over one set of components MUST NOT be accepted as proof over a different set of components.<a href="#section-23.8-1" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="delegation-confusion-and-signer-key-binding">
 <section id="section-23.9">
         <h3 id="name-delegation-confusion-and-si">
 <a href="#section-23.9" class="section-number selfRef">23.9. </a><a href="#name-delegation-confusion-and-si" class="section-name selfRef">Delegation Confusion and Signer-Key Binding</a>
         </h3>
 <p id="section-23.9-1">Delegation tokens MUST be checked for issuer, subject, audience, scope, time validity, and <code>jti</code>.  A delegation token MUST NOT be treated as an unrestricted bearer credential.<a href="#section-23.9-1" class="pilcrow">¶</a></p>
 <p id="section-23.9-2">Delegation chains MUST preserve order and MUST prevent downstream scope escalation.<a href="#section-23.9-2" class="pilcrow">¶</a></p>
-<p id="section-23.9-3">A critical class of delegation confusion arises when a verifier checks the delegation token and the HTTP request signature independently without confirming that both are associated with the same acting agent's key material.  In such a case, an attacker may present a legitimate delegation token alongside an HTTP request signed by a different key --- a key that the attacker controls --- and thereby act on delegated authority without possessing the legitimate agent's signing key.<a href="#section-23.9-3" class="pilcrow">¶</a></p>
+<p id="section-23.9-3">A critical class of delegation confusion arises when a verifier checks the delegation token and the HTTP request signature independently without confirming that both are associated with the same acting agent's key material.  In such a case, an attacker may present a legitimate delegation token alongside an HTTP request signed by a different key — a key that the attacker controls — and thereby act on delegated authority without possessing the legitimate agent's signing key.<a href="#section-23.9-3" class="pilcrow">¶</a></p>
 <p id="section-23.9-4">To prevent this, implementations MUST bind:<a href="#section-23.9-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-23.9-5.1">the delegation token signature key to the delegation issuer's verified identity; and<a href="#section-23.9-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-23.9-5.1">
+            <p id="section-23.9-5.1.1">the delegation token signature key to the delegation issuer's verified identity; and<a href="#section-23.9-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-23.9-5.2">the HTTP request signature key to the delegation subject's (or chain final subject's) verified identity.<a href="#section-23.9-5.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-23.9-5.2">
+            <p id="section-23.9-5.2.1">the HTTP request signature key to the delegation subject's (or chain final subject's) verified identity.<a href="#section-23.9-5.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-23.9-6">The HTTP message signer key MUST be resolved from the delegation subject's verified key set.  A verifier MUST NOT derive an allow decision from the combination of a valid delegation token and a valid HTTP request signature unless both keys are bound to the corresponding agents' verified identity evidence.<a href="#section-23.9-6" class="pilcrow">¶</a></p>
 <p id="section-23.9-7">Failure to enforce this binding allows confused-deputy behavior, where the delegation grants authority over one agent and the request signature is produced by a different, potentially malicious party.<a href="#section-23.9-7" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="status-document-integrity">
 <section id="section-23.10">
         <h3 id="name-status-document-integrity">
 <a href="#section-23.10" class="section-number selfRef">23.10. </a><a href="#name-status-document-integrity" class="section-name selfRef">Status Document Integrity</a>
         </h3>
-<p id="section-23.10-1">The current alpha implementation validates status document structure and evaluates status decisions based on the declared status value.  The current AgIS profile does not yet define a signed status document format for production use.<a href="#section-23.10-1" class="pilcrow">¶</a></p>
-<p id="section-23.10-2">For live status retrieval, implementations MUST protect status endpoint access using authenticated transport (HTTPS with valid certificates).  Implementations SHOULD use signed status documents or an equivalent integrity-protection mechanism before relying on status for high-assurance decisions.  An unsigned status document served over plain HTTPS is susceptible to modification by an adversary who can intercept or control the status endpoint.<a href="#section-23.10-2" class="pilcrow">¶</a></p>
-<p id="section-23.10-3">Implementations MUST NOT claim compliance with a signed status document format based on the current alpha implementation alone.<a href="#section-23.10-3" class="pilcrow">¶</a></p>
+<p id="section-23.10-1">Status document values directly control the trust decision for an agent: <code>active</code> produces allow; <code>revoked</code>, <code>suspended</code>, and <code>compromised</code> produce deny; <code>unknown</code> and <code>deprecated</code> produce review.  An attacker who can modify a status document in transit or at rest can therefore elevate a revoked agent to active, or deny service to a legitimate agent.<a href="#section-23.10-1" class="pilcrow">¶</a></p>
+<p id="section-23.10-2">The v0.3.0-alpha.3 reference implementation supports optional and required EdDSA/JWS signatures over status documents.  The signature covers the JCS-canonicalized status document excluding the <code>signature</code> field.  Verifiers can require a valid status signature before accepting a status decision.<a href="#section-23.10-2" class="pilcrow">¶</a></p>
+<p id="section-23.10-3">For live status retrieval, implementations MUST protect status endpoint access using authenticated transport (HTTPS with valid certificates).  Live status fetching without signature verification is not sufficient for high-assurance revocation enforcement; an unsigned status document served over plain HTTPS is susceptible to modification by an adversary who controls the status endpoint or a network path to it.<a href="#section-23.10-3" class="pilcrow">¶</a></p>
+<p id="section-23.10-4">Production deployments SHOULD use signed status documents.  Implementations SHOULD verify the status document signature before trusting a status decision in any high-assurance context.  The status signature key SHOULD be the same key declared in the Agent Card, or a key verifiably associated with the same agent identity.<a href="#section-23.10-4" class="pilcrow">¶</a></p>
+<p id="section-23.10-5">Implementations MUST NOT treat the current alpha signed status document support as a complete production mechanism.  Live DNS and HTTPS resolver behavior and long-term key management for status signing remain out of scope for this profile version.<a href="#section-23.10-5" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="test-keys">
 <section id="section-23.11">
         <h3 id="name-test-keys">
 <a href="#section-23.11" class="section-number selfRef">23.11. </a><a href="#name-test-keys" class="section-name selfRef">Test Keys</a>
         </h3>
 <p id="section-23.11-1">The deterministic test keys included with the reference implementation are public test material.  They MUST NOT be used in production.<a href="#section-23.11-1" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="local-authorization">
 <section id="section-23.12">
         <h3 id="name-local-authorization">
 <a href="#section-23.12" class="section-number selfRef">23.12. </a><a href="#name-local-authorization" class="section-name selfRef">Local Authorization</a>
         </h3>
 <p id="section-23.12-1">AgIS verification does not authorize an action by itself.  A relying party MUST apply local authorization policy after identity, request, freshness, status, and delegation checks.<a href="#section-23.12-1" class="pilcrow">¶</a></p>
 </section>
+</div>
 </section>
+</div>
+<div id="privacy-considerations">
 <section id="section-24">
       <h2 id="name-privacy-considerations">
 <a href="#section-24" class="section-number selfRef">24. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
@@ -2540,6 +2736,8 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-24-3">Verifiers SHOULD avoid logging sensitive request bodies, delegation tokens, or identifiers beyond operational necessity.<a href="#section-24-3" class="pilcrow">¶</a></p>
 <p id="section-24-4">Delegation chains can reveal workflow structure.  Deployments SHOULD minimize delegated scope, token lifetime, and exposed constraints.<a href="#section-24-4" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="iana-considerations">
 <section id="section-25">
       <h2 id="name-iana-considerations">
 <a href="#section-25" class="section-number selfRef">25. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
@@ -2547,204 +2745,239 @@ agis=("agis-agent" "agis-nonce" "@method" "@target-uri" "content-digest" "date")
 <p id="section-25-1">This document makes no IANA requests at this time.<a href="#section-25-1" class="pilcrow">¶</a></p>
 <p id="section-25-2">Future versions may request registration of:<a href="#section-25-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-25-3.1">the <code>agent</code> URI scheme;<a href="#section-25-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-25-3.1">
+          <p id="section-25-3.1.1">the <code>agent</code> URI scheme;<a href="#section-25-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-25-3.2">an AgIS well-known URI;<a href="#section-25-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-25-3.2">
+          <p id="section-25-3.2.1">an AgIS well-known URI;<a href="#section-25-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-25-3.3">AgIS-specific HTTP field names;<a href="#section-25-3.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-25-3.3">
+          <p id="section-25-3.3.1">AgIS-specific HTTP field names;<a href="#section-25-3.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-25-3.4">AgIS parameter registries.<a href="#section-25-3.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-25-3.4">
+          <p id="section-25-3.4.1">AgIS parameter registries.<a href="#section-25-3.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-25-4">No such registrations are requested by this version of the document.<a href="#section-25-4" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="implementation-status">
 <section id="section-26">
       <h2 id="name-implementation-status">
 <a href="#section-26" class="section-number selfRef">26. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
       </h2>
 <p id="section-26-1">This section records implementation status for informational purposes and is expected to be removed or updated before publication as an RFC.<a href="#section-26-1" class="pilcrow">¶</a></p>
-<p id="section-26-2">The AgIS v0.3.0-alpha.2 reference implementation includes:<a href="#section-26-2" class="pilcrow">¶</a></p>
+<p id="section-26-2">The AgIS v0.3.0-alpha.3 reference implementation includes:<a href="#section-26-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-26-3.1">a TypeScript SDK (<code>@epicortek/agis-sdk-ts</code>);<a href="#section-26-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-26-3.1">
+          <p id="section-26-3.1.1">a TypeScript SDK (<code>@epicortek/agis-sdk-ts</code>);<a href="#section-26-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.2">a CLI named <code>agis</code> (<code>@epicortek/agis-cli</code>);<a href="#section-26-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.2">
+          <p id="section-26-3.2.1">a CLI named <code>agis</code> (<code>@epicortek/agis-cli</code>);<a href="#section-26-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.3">19 deterministic test vectors covering all features and selected negative cases;<a href="#section-26-3.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.3">
+          <p id="section-26-3.3.1">23 deterministic test vectors covering all features and selected negative cases;<a href="#section-26-3.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.4">offline identity verification;<a href="#section-26-3.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.4">
+          <p id="section-26-3.4.1">offline identity verification;<a href="#section-26-3.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.5">Agent Card canonical hashing;<a href="#section-26-3.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.5">
+          <p id="section-26-3.5.1">Agent Card canonical hashing;<a href="#section-26-3.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.6">JWK thumbprint verification;<a href="#section-26-3.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.6">
+          <p id="section-26-3.6.1">JWK thumbprint verification;<a href="#section-26-3.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.7">DNS Binding parsing;<a href="#section-26-3.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.7">
+          <p id="section-26-3.7.1">DNS Binding parsing;<a href="#section-26-3.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.8">signed Agent Card verification with explicit EdDSA algorithm verification;<a href="#section-26-3.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.8">
+          <p id="section-26-3.8.1">signed Agent Card verification with explicit EdDSA algorithm verification;<a href="#section-26-3.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.9">status and revocation validation with a status decision policy (<code>active</code> allows, <code>revoked</code>/<code>suspended</code>/<code>compromised</code> deny, <code>unknown</code>/<code>deprecated</code> review);<a href="#section-26-3.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.9">
+          <p id="section-26-3.9.1">status and revocation validation with a status decision policy (<code>active</code> → allow, <code>revoked</code>/<code>suspended</code>/<code>compromised</code> → deny, <code>unknown</code>/<code>deprecated</code> → review);<a href="#section-26-3.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.10">Content-Digest validation;<a href="#section-26-3.10" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.10">
+          <p id="section-26-3.10.1">signed agent status document support: EdDSA/JWS signature generation and verification over JCS-canonicalized status documents; optional or required signature verification with <code>requireSignature</code> option;<a href="#section-26-3.10.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.11">HTTP Message Signature verification;<a href="#section-26-3.11" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.11">
+          <p id="section-26-3.11.1">Content-Digest validation;<a href="#section-26-3.11.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.12">freshness and two-phase replay protection (check then commit only on allow);<a href="#section-26-3.12" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.12">
+          <p id="section-26-3.12.1">HTTP Message Signature verification;<a href="#section-26-3.12.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.13">single delegation token verification;<a href="#section-26-3.13" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.13">
+          <p id="section-26-3.13.1">freshness and two-phase replay protection (check then commit only on allow);<a href="#section-26-3.13.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.14">delegated signed request verification with signer-key binding enforced by default;<a href="#section-26-3.14" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.14">
+          <p id="section-26-3.14.1">single delegation token verification;<a href="#section-26-3.14.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-26-3.15">delegation chain verification with final-subject signer-key binding enforced by default.<a href="#section-26-3.15" class="pilcrow">¶</a>
+        <li class="normal" id="section-26-3.15">
+          <p id="section-26-3.15.1">delegated signed request verification with signer-key binding enforced by default;<a href="#section-26-3.15.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-26-3.16">
+          <p id="section-26-3.16.1">delegation chain verification with final-subject signer-key binding enforced by default.<a href="#section-26-3.16.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-26-4">The implementation enforces that delegated request verification produces an allow decision only when the HTTP message signature key is demonstrably bound to the delegation subject's verified identity.  A deprecated compatibility path (<code>requestSignerPublicJwk</code> without <code>actingSubjectPublicKeys</code>) requires an explicit caller opt-in flag (<code>allowUnboundDeprecatedSignerKey: true</code>) and produces a warning; without the opt-in, the decision is deny.<a href="#section-26-4" class="pilcrow">¶</a></p>
 <p id="section-26-5">The implementation is positioned as an ANS-compatible verification and governance layer.  It is not affiliated with or endorsed by Linux Foundation ANS.<a href="#section-26-5" class="pilcrow">¶</a></p>
-<p id="section-26-6">The implementation does not yet define:<a href="#section-26-6" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-26-7.1">production live DNS or HTTPS resolver behavior;<a href="#section-26-7.1" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-26-7.2">a signed status document format;<a href="#section-26-7.2" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-26-7.3">a production trust network or global trust root.<a href="#section-26-7.3" class="pilcrow">¶</a>
-</li>
-      </ul>
+<p id="section-26-6">The implementation does not yet define production live DNS or HTTPS resolver behavior, DNSSEC validation requirements, automatic binding of status signing keys to live resolver trust anchors, a production trust network, or a global trust root.<a href="#section-26-6" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="acknowledgements">
 <section id="section-27">
       <h2 id="name-acknowledgements">
 <a href="#section-27" class="section-number selfRef">27. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
 <p id="section-27-1">The author thanks the broader Internet standards community whose existing specifications make it possible to define AgIS as a narrow profile over deployed web infrastructure rather than as a new stack.<a href="#section-27-1" class="pilcrow">¶</a></p>
 </section>
+</div>
+<div id="sec-combined-references">
 <section id="section-28">
-      <h2 id="name-normative-references">
-<a href="#section-28" class="section-number selfRef">28. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      <h2 id="name-references">
+<a href="#section-28" class="section-number selfRef">28. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-28.1">
+        <h3 id="name-normative-references">
+<a href="#section-28.1" class="section-number selfRef">28.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <time datetime="1997" class="refDate">1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC8174">[RFC8174]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <time datetime="2017" class="refDate">2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC3986">[RFC3986]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"Uniform Resource Identifier (URI): Generic Syntax"</span>, <span class="seriesInfo">STD 66</span>, <time datetime="2005" class="refDate">2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3986">https://www.rfc-editor.org/rfc/rfc3986</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Berners-Lee, T.</span>, <span class="refAuthor">Fielding, R.</span>, and <span class="refAuthor">L. Masinter</span>, <span class="refTitle">"Uniform Resource Identifier (URI): Generic Syntax"</span>, <span class="seriesInfo">STD 66</span>, <span class="seriesInfo">RFC 3986</span>, <span class="seriesInfo">DOI 10.17487/RFC3986</span>, <time datetime="2005-01" class="refDate">January 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3986">https://www.rfc-editor.org/rfc/rfc3986</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5234">[RFC5234]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"Augmented BNF for Syntax Specifications: ABNF"</span>, <span class="seriesInfo">STD 68</span>, <time datetime="2008" class="refDate">2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5234">https://www.rfc-editor.org/rfc/rfc5234</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Crocker, D., Ed.</span> and <span class="refAuthor">P. Overell</span>, <span class="refTitle">"Augmented BNF for Syntax Specifications: ABNF"</span>, <span class="seriesInfo">STD 68</span>, <span class="seriesInfo">RFC 5234</span>, <span class="seriesInfo">DOI 10.17487/RFC5234</span>, <time datetime="2008-01" class="refDate">January 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5234">https://www.rfc-editor.org/rfc/rfc5234</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7517">[RFC7517]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"JSON Web Key (JWK)"</span>, <span class="seriesInfo">RFC 7517</span>, <time datetime="2015" class="refDate">2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7517">https://www.rfc-editor.org/rfc/rfc7517</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refTitle">"JSON Web Key (JWK)"</span>, <span class="seriesInfo">RFC 7517</span>, <span class="seriesInfo">DOI 10.17487/RFC7517</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7517">https://www.rfc-editor.org/rfc/rfc7517</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7638">[RFC7638]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"JSON Web Key (JWK) Thumbprint"</span>, <span class="seriesInfo">RFC 7638</span>, <time datetime="2015" class="refDate">2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7638">https://www.rfc-editor.org/rfc/rfc7638</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Jones, M.</span> and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Key (JWK) Thumbprint"</span>, <span class="seriesInfo">RFC 7638</span>, <span class="seriesInfo">DOI 10.17487/RFC7638</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7638">https://www.rfc-editor.org/rfc/rfc7638</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8037">[RFC8037]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"CFRG Elliptic Curves for JOSE"</span>, <span class="seriesInfo">RFC 8037</span>, <time datetime="2017" class="refDate">2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8037">https://www.rfc-editor.org/rfc/rfc8037</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Liusvaara, I.</span>, <span class="refTitle">"CFRG Elliptic Curve Diffie-Hellman (ECDH) and Signatures in JSON Object Signing and Encryption (JOSE)"</span>, <span class="seriesInfo">RFC 8037</span>, <span class="seriesInfo">DOI 10.17487/RFC8037</span>, <time datetime="2017-01" class="refDate">January 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8037">https://www.rfc-editor.org/rfc/rfc8037</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8615">[RFC8615]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"Well-Known Uniform Resource Identifiers (URIs)"</span>, <span class="seriesInfo">RFC 8615</span>, <time datetime="2019" class="refDate">2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8615">https://www.rfc-editor.org/rfc/rfc8615</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Well-Known Uniform Resource Identifiers (URIs)"</span>, <span class="seriesInfo">RFC 8615</span>, <span class="seriesInfo">DOI 10.17487/RFC8615</span>, <time datetime="2019-05" class="refDate">May 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8615">https://www.rfc-editor.org/rfc/rfc8615</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8785">[RFC8785]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"JSON Canonicalization Scheme (JCS)"</span>, <span class="seriesInfo">RFC 8785</span>, <time datetime="2020" class="refDate">2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8785">https://www.rfc-editor.org/rfc/rfc8785</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Rundgren, A.</span>, <span class="refAuthor">Jordan, B.</span>, and <span class="refAuthor">S. Erdtman</span>, <span class="refTitle">"JSON Canonicalization Scheme (JCS)"</span>, <span class="seriesInfo">RFC 8785</span>, <span class="seriesInfo">DOI 10.17487/RFC8785</span>, <time datetime="2020-06" class="refDate">June 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8785">https://www.rfc-editor.org/rfc/rfc8785</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9110">[RFC9110]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <time datetime="2022" class="refDate">2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9421">[RFC9421]</dt>
-      <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="seriesInfo">RFC 9421</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9421">https://www.rfc-editor.org/rfc/rfc9421</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Backman, A., Ed.</span>, <span class="refAuthor">Richer, J., Ed.</span>, and <span class="refAuthor">M. Sporny</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="seriesInfo">RFC 9421</span>, <span class="seriesInfo">DOI 10.17487/RFC9421</span>, <time datetime="2024-02" class="refDate">February 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9421">https://www.rfc-editor.org/rfc/rfc9421</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9530">[RFC9530]</dt>
-    <dd>
-<span class="refAuthor">IETF</span>, <span class="refTitle">"Digest Fields"</span>, <span class="seriesInfo">RFC 9530</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9530">https://www.rfc-editor.org/rfc/rfc9530</a>&gt;</span>. </dd>
+      <dd>
+<span class="refAuthor">Polli, R.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"Digest Fields"</span>, <span class="seriesInfo">RFC 9530</span>, <span class="seriesInfo">DOI 10.17487/RFC9530</span>, <time datetime="2024-02" class="refDate">February 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9530">https://www.rfc-editor.org/rfc/rfc9530</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
-<section id="section-29">
-      <h2 id="name-informative-references">
-<a href="#section-29" class="section-number selfRef">29. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
-      </h2>
+</div>
+<div id="sec-informative-references">
+<section id="section-28.2">
+        <h3 id="name-informative-references">
+<a href="#section-28.2" class="section-number selfRef">28.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
 <dl class="references">
+<dt id="AGIS-CLI">[AGIS-CLI]</dt>
+        <dd>
+<span class="refAuthor">EPICORTEK Technologies Inc.</span>, <span class="refTitle">"AgIS CLI"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://www.npmjs.com/package/@epicortek/agis-cli">https://www.npmjs.com/package/@epicortek/agis-cli</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="AGIS-IMPL">[AGIS-IMPL]</dt>
-      <dd>
-<span class="refAuthor">EPICORTEK Technologies Inc.</span>, <span class="refTitle">"AgIS v0.3.0-alpha.2 Reference Implementation, CLI, and Deterministic Test Vectors"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://github.com/epicortek/agis">https://github.com/epicortek/agis</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">EPICORTEK Technologies Inc.</span>, <span class="refTitle">"AgIS v0.3.0-alpha.3 Reference Implementation, CLI, and Deterministic Test Vectors"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://github.com/epicortek/agis">https://github.com/epicortek/agis</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="AGIS-SDK">[AGIS-SDK]</dt>
       <dd>
 <span class="refAuthor">EPICORTEK Technologies Inc.</span>, <span class="refTitle">"AgIS TypeScript SDK"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://www.npmjs.com/package/@epicortek/agis-sdk-ts">https://www.npmjs.com/package/@epicortek/agis-sdk-ts</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="AGIS-CLI">[AGIS-CLI]</dt>
-    <dd>
-<span class="refAuthor">EPICORTEK Technologies Inc.</span>, <span class="refTitle">"AgIS CLI"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://www.npmjs.com/package/@epicortek/agis-cli">https://www.npmjs.com/package/@epicortek/agis-cli</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 </dl>
 </section>
+</div>
+</section>
+</div>
+<div id="example-agent-identifier">
 <section id="appendix-A">
-      <h2 id="name-examples">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-examples" class="section-name selfRef">Examples</a>
+      <h2 id="name-example-agent-identifier">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-example-agent-identifier" class="section-name selfRef">Example Agent Identifier</a>
       </h2>
-<section id="appendix-A.1">
-        <h3 id="name-example-agent-identifier">
-<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-example-agent-identifier" class="section-name selfRef">Example Agent Identifier</a>
-        </h3>
-<div class="alignLeft art-text artwork" id="appendix-A.1-1">
+<div class="lang-text sourcecode" id="appendix-A-1">
 <pre>
 agent://example.com/support-agent
-</pre><a href="#appendix-A.1-1" class="pilcrow">¶</a>
+</pre><a href="#appendix-A-1" class="pilcrow">¶</a>
 </div>
 </section>
-<section id="appendix-A.2">
-        <h3 id="name-example-dns-txt-binding">
-<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-example-dns-txt-binding" class="section-name selfRef">Example DNS TXT Binding</a>
-        </h3>
-<div class="alignLeft art-text artwork" id="appendix-A.2-1">
+</div>
+<div id="example-dns-txt-binding">
+<section id="appendix-B">
+      <h2 id="name-example-dns-txt-binding">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-example-dns-txt-binding" class="section-name selfRef">Example DNS TXT Binding</a>
+      </h2>
+<div class="lang-text sourcecode" id="appendix-B-1">
 <pre>
 agis=0.2.2; agent=agent://example.com/support-agent; card=https://example.com/.well-known/agis/agents/support-agent.json; jkt=dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08; card_sha256=842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
-</pre><a href="#appendix-A.2-1" class="pilcrow">¶</a>
+</pre><a href="#appendix-B-1" class="pilcrow">¶</a>
 </div>
 </section>
-<section id="appendix-A.3">
-        <h3 id="name-example-agent-card-hash">
-<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-example-agent-card-hash" class="section-name selfRef">Example Agent Card Hash</a>
-        </h3>
-<div class="alignLeft art-text artwork" id="appendix-A.3-1">
+</div>
+<div id="example-agent-card-hash">
+<section id="appendix-C">
+      <h2 id="name-example-agent-card-hash">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-example-agent-card-hash" class="section-name selfRef">Example Agent Card Hash</a>
+      </h2>
+<div class="lang-text sourcecode" id="appendix-C-1">
 <pre>
 842dbbbf1c807d020ceafe7fd8b51502cf7ae94314238e293a36c736463a3122
-</pre><a href="#appendix-A.3-1" class="pilcrow">¶</a>
+</pre><a href="#appendix-C-1" class="pilcrow">¶</a>
 </div>
 </section>
-<section id="appendix-A.4">
-        <h3 id="name-example-jwk-thumbprint">
-<a href="#appendix-A.4" class="section-number selfRef">A.4. </a><a href="#name-example-jwk-thumbprint" class="section-name selfRef">Example JWK Thumbprint</a>
-        </h3>
-<div class="alignLeft art-text artwork" id="appendix-A.4-1">
+</div>
+<div id="example-jwk-thumbprint">
+<section id="appendix-D">
+      <h2 id="name-example-jwk-thumbprint">
+<a href="#appendix-D" class="section-number selfRef">Appendix D. </a><a href="#name-example-jwk-thumbprint" class="section-name selfRef">Example JWK Thumbprint</a>
+      </h2>
+<div class="lang-text sourcecode" id="appendix-D-1">
 <pre>
 dXBQ4ZkgA3nTvwrFeLAKYokanVfetC0fzXUiSFkYg08
-</pre><a href="#appendix-A.4-1" class="pilcrow">¶</a>
+</pre><a href="#appendix-D-1" class="pilcrow">¶</a>
 </div>
 </section>
-<section id="appendix-A.5">
-        <h3 id="name-example-content-digest">
-<a href="#appendix-A.5" class="section-number selfRef">A.5. </a><a href="#name-example-content-digest" class="section-name selfRef">Example Content-Digest</a>
-        </h3>
-<div class="alignLeft art-text artwork" id="appendix-A.5-1">
+</div>
+<div id="example-content-digest">
+<section id="appendix-E">
+      <h2 id="name-example-content-digest">
+<a href="#appendix-E" class="section-number selfRef">Appendix E. </a><a href="#name-example-content-digest" class="section-name selfRef">Example Content-Digest</a>
+      </h2>
+<div class="lang-text sourcecode" id="appendix-E-1">
 <pre>
 sha-256=:EElbeZnbXXnH5AMO46WOKBIN6fvWcuBFv/qlOLFgSYk=:
-</pre><a href="#appendix-A.5-1" class="pilcrow">¶</a>
+</pre><a href="#appendix-E-1" class="pilcrow">¶</a>
 </div>
 </section>
-</section>
+</div>
 <div id="authors-addresses">
-<section id="appendix-B">
+<section id="appendix-F">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
